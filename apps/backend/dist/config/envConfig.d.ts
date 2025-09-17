@@ -1,0 +1,26 @@
+export declare const env: {
+    isDevelopment: boolean;
+    isProduction: boolean;
+    isTest: boolean;
+    NODE_ENV: "production" | "development" | "test";
+    APP_NAME: string;
+    APP_PORT: number;
+    APP_FRONTEND_URL: string;
+    PRO_MONGO_URI: string;
+    SMTP_EMAIL_USER: string;
+    SMTP_EMAIL_PASSWORD: string;
+    SMTP_EMAIL_SERVICE: string;
+    SMTP_EMAIL_HOST: string;
+    SMTP_EMAIL_PORT: number;
+    EMAIL_SENDER_FROM: string;
+    CORS_ORIGIN: string;
+    RATE_LIMIT_WINDOW: number;
+    RATE_LIMIT_MAX: number;
+    JWT_SECRET: string;
+    JWT_ACCOUNT_ACTIVATION: string;
+    JWT_ACCESS_EXPIRATION_MINUTES: number;
+    JWT_REFRESH_TOKEN_EXPIRATION_DAYS: number;
+    JWT_RESET_PASSWORD_EXPIRATION_MINUTES: number;
+    JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: number;
+    SENTRY_DSN?: string | undefined;
+};

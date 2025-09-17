@@ -1,0 +1,12 @@
+import { RequestHandler } from "express";
+declare const signUp: RequestHandler;
+declare const activateUserAccount: RequestHandler;
+declare const signIn: RequestHandler;
+declare const signOut: RequestHandler;
+declare const sendVerificationEmail: RequestHandler;
+declare const verifyEmailAccount: RequestHandler;
+declare const refreshToken: RequestHandler;
+declare const forgotPasswordLink: RequestHandler;
+declare const newPassword: RequestHandler;
+declare const changePassword: RequestHandler;
+export { signUp, activateUserAccount, signIn, signOut, sendVerificationEmail, verifyEmailAccount, refreshToken, forgotPasswordLink, newPassword, changePassword, };

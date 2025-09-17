@@ -1,0 +1,138 @@
+{
+    "projects": [
+        {
+            "_id": "60c72b2f9b1d8e5a2f0f1e99",
+            "name": "AgriDex",
+            "slug": "agridex",
+            "description": "AgriDex is a decentralized platform revolutionizing agricultural supply chains using blockchain.",
+            "category": "Agriculture",
+            "region": "west africa",
+            "country": "Nigeria",
+            "chainDeployedTo": [
+                "ethereum"
+            ],
+            "tokenSymbol": "AGRI",
+            "website": "https://agridex.org",
+            "communityLinks": [
+                "https://twitter.com/AgriDex"
+            ],
+            "exchangeLinks": [
+                "https://coinmarketcap.com/currencies/agridex/"
+            ],
+            "whitepaperLink": "https://agridex.org/whitepaper",
+            "tokenAddress": "0x1234567890abcdef1234567890abcdef12345678",
+            "tags": [
+                "DeFi",
+                "Agriculture",
+                "Blockchain"
+            ],
+            "listedAt": "2025-06-09T15:44:08.331808",
+            "isActive": true,
+            "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/27988.png",
+            "keyBackers": [
+                "AgTech Ventures",
+                "Green Capital"
+            ],
+            "aiInsights": {
+                "summary": "AgriDex bridges agriculture and DeFi, offering innovative market access for farmers.",
+                "newsLinks": [
+                    "https://example.com/news/agridex"
+                ],
+                "sentimentScore": 0.82
+            },
+            "createdAt": "2025-06-09T15:44:08.331816",
+            "updatedAt": "2025-06-09T15:44:08.331818"
+        }
+    ],
+    "listings": [
+        {
+            "projectId": "60c72b2f9b1d8e5a2f0f1e99",
+            "listedAt": "2025-06-09T15:44:08.331872",
+            "createdAt": "2025-06-09T15:44:08.331874",
+            "updatedAt": "2025-06-09T15:44:08.331875"
+        }
+    ],
+    "news": [
+        {
+            "projectId": "60c72b2f9b1d8e5a2f0f1e99",
+            "title": "AgriDex launches DeFi farming incentives",
+            "link": "https://example.com/news/agridex-incentives",
+            "publishedAt": "2025-06-09T15:44:08.331917",
+            "source": "CryptoNews"
+        }
+    ],
+    "projectHistories": [
+        {
+            "projectId": "60c72b2f9b1d8e5a2f0f1e99",
+            "timestamp": "2025-06-09T15:44:08.332004",
+            "priceUSD": 0.054,
+            "marketCapUSD": 538451,
+            "volume24hUSD": 12798,
+            "holdersCount": 3451,
+            "createdAt": "2025-06-09T15:44:08.332006",
+            "updatedAt": "2025-06-09T15:44:08.332008"
+        }
+    ],
+    "metrics": [
+        {
+            "projectId": "60c72b2f9b1d8e5a2f0f1e99",
+            "tokenSymbol": "AGRI",
+            "tokenName": "AgriDex",
+            "priceUSD": 0.054,
+            "priceChange24h": -1.62,
+            "marketCapUSD": 538451,
+            "volume24hUSD": 12798,
+            "circulatingSupply": 10000000,
+            "totalSupply": 50000000,
+            "holdersCount": 3451,
+            "lastUpdated": "2025-06-09T15:44:08.332067"
+        }
+    ],
+    "submissions": [
+        {
+            "submittedBy": "60c72b2f9b1d8e5a2f0f1abc",
+            "name": "AgriDex",
+            "slug": "agridex",
+            "description": "Community-submitted agricultural DeFi project.",
+            "category": "Agriculture",
+            "website": "https://agridex.org",
+            "tokenSymbol": "AGRI",
+            "status": "approved",
+            "adminNotes": "Approved for listing",
+            "createdAt": "2025-06-09T15:44:08.332157",
+            "updatedAt": "2025-06-09T15:44:08.332161"
+        }
+    ],
+    "tokenomics": [
+        {
+            "projectId": "60c72b2f9b1d8e5a2f0f1e99",
+            "useOfFunds": [
+                {
+                    "category": "Development",
+                    "percentage": 40
+                },
+                {
+                    "category": "Marketing",
+                    "percentage": 30
+                },
+                {
+                    "category": "Operations",
+                    "percentage": 30
+                }
+            ],
+            "vestingSchedule": "2-year cliff, quarterly release",
+            "tokenReleaseChartUrl": "https://agridex.org/token-release.png",
+            "tokenDistributionChartUrl": "https://agridex.org/token-distribution.png",
+            "createdAt": "2025-06-09T15:44:08.332237",
+            "updatedAt": "2025-06-09T15:44:08.332239"
+        }
+    ],
+    "watchlists": [
+        {
+            "userId": "60c72b2f9b1d8e5a2f0f1abc",
+            "projectId": "60c72b2f9b1d8e5a2f0f1e99",
+            "createdAt": "2025-06-09T15:44:08.332291",
+            "updatedAt": "2025-06-09T15:44:08.332293"
+        }
+    ]
+}

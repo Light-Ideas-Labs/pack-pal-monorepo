@@ -1,0 +1,10 @@
+import { RequestHandler } from 'express';
+declare const createUser: RequestHandler;
+declare const getUser: RequestHandler;
+declare const listUsers: RequestHandler;
+declare const updateUser: RequestHandler;
+declare const deleteUser: RequestHandler;
+declare const promoteUserRole: RequestHandler;
+declare const addUserProject: RequestHandler;
+declare const removeUserProject: RequestHandler;
+export { createUser, getUser, listUsers, updateUser, deleteUser, promoteUserRole, addUserProject, removeUserProject };

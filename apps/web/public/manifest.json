@@ -1,0 +1,44 @@
+{
+  "name": "PackPal — Trips, Packing & Offline Planner",
+  "short_name": "PackPal",
+  "description": "Plan trips, build packing lists, save documents, and use it offline—anywhere.",
+  "start_url": "/trips?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B1020",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait-primary",
+  "categories": ["travel", "productivity", "lifestyle", "navigation"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "My Trips",
+      "short_name": "Trips",
+      "description": "Open your trips",
+      "url": "/trips",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Packing Lists",
+      "short_name": "Packing",
+      "description": "Jump to packing lists",
+      "url": "/packing",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Explore Destinations",
+      "short_name": "Explore",
+      "description": "Browse places & ideas",
+      "url": "/explore",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
