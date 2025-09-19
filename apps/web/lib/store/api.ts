@@ -8,6 +8,7 @@ type FetchMethod = "GET"|"POST"|"PATCH"|"PUT"|"DELETE";
 const isMutating = (m?: string) => (["POST","PATCH","PUT","DELETE"] as FetchMethod[]).includes((m||"GET").toUpperCase() as FetchMethod)
 
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE;
+console.log("[api] baseUrl:", baseUrl);
 
 /** public endpoints that should Never trigger refresh */
 const PUBLIC_AUTH_PATHS = [
@@ -68,7 +69,7 @@ const rawBase = fetchBaseQuery({
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
     const { user } = (getState() as RootState).global;
-    const token = user?.accessToken;  // adjust to your actual slice property
+    const token = (getState() as any).auth?.token as string | null;  // adjust to your actual slice property
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
     } else if (user?.guestId) {
@@ -79,7 +80,7 @@ const rawBase = fetchBaseQuery({
 });
 
 const customBaseQuery = async (args: string | FetchArgs, api: BaseQueryApi, extra: object) => {
-  const method = (typeof args === "string" ? undefined : args.method) as string | undefined;
+  const method = typeof args === "string" ? undefined : args.method;
   const url = (typeof args === "string" ? args : args.url) || "";
 
   let res = await rawBase(args, api, extra);
@@ -89,8 +90,9 @@ const customBaseQuery = async (args: string | FetchArgs, api: BaseQueryApi, extr
   // - the original request is NOT a public auth endpoint
   // - we appear to have a logged-in session (e.g., we store a refresh token or are “authenticated” in state)
   // - we are not already calling refresh-token (avoid loops)
-  const state = api.getState() as RootState;
-  const looksLoggedIn = Boolean(state.global.user?.accessToken || state.global.user?.refreshToken);
+  const state = api.getState() as any;
+  const token = state?.auth?.token as string | null;
+  const looksLoggedIn = Boolean(token);
 
   if (res.error?.status === 401 && !isPublicAuthUrl(url) && looksLoggedIn) {
     const refresh = await rawBase({ url: "/auth/refresh-token", method: "POST" }, api, extra);
@@ -106,6 +108,7 @@ const customBaseQuery = async (args: string | FetchArgs, api: BaseQueryApi, extr
   } else {
     // If you want the data typed, narrow to the envelope here:
     const data = res.data as ApiEnvelope;      // <— typed, not any
+    console.log("[api] success:", method, url, data);
     handleApiSuccess(data, method, url);
   }
 

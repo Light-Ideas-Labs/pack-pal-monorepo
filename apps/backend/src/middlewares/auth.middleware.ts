@@ -29,7 +29,7 @@ function ensureGuestSession(req: Request, res: Response): string {
 
 /** Strict: requires a valid access token */
 const requireAuth: RequestHandler = asyncHandler(async (req, res, next) => {
-  let token = req.cookies?.access_token || req.headers["authorization"];
+  let token = req.cookies?.accessToken || req.headers["authorization"];
   if (typeof token === "string" && token.startsWith("Bearer ")) token = token.slice(7);
 
   if (!token) {
@@ -61,7 +61,7 @@ const requireAuth: RequestHandler = asyncHandler(async (req, res, next) => {
 
 /** Soft: sets req.user if token present; otherwise continues silently */
 const optionalAuth: RequestHandler = asyncHandler(async (req, _res, next) => {
-  let token = req.cookies?.access_token || req.headers["authorization"];
+  let token = req.cookies?.accessToken || req.headers["authorization"];
   if (typeof token === "string" && token.startsWith("Bearer ")) token = token.slice(7);
   if (!token || !env.JWT_SECRET) return next();
 

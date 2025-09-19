@@ -7,6 +7,7 @@ export type UserInfo = {
   status?: string
   email?: string
   userName?: string
+  avatarUrl?: string
 }
 
 export type AuthState = {
@@ -24,13 +25,7 @@ const readCookie = (name: string): string | null => {
 
 const writeCookie = (name: string, value: string, maxAgeSec = 60 * 60) => {
   if (typeof document === "undefined") return
-  const parts = [
-    `${name}=${encodeURIComponent(value)}`,
-    "Path=/",
-    "SameSite=Lax",
-    process.env.NODE_ENV === "production" ? "Secure" : "",
-    `Max-Age=${maxAgeSec}`,
-  ].filter(Boolean)
+  const parts = [`${name}=${encodeURIComponent(value)}`, "Path=/", "SameSite=Lax", process.env.NODE_ENV === "production" ? "Secure" : "", `Max-Age=${maxAgeSec}`].filter(Boolean)
   document.cookie = parts.join("; ")
 }
 
@@ -41,7 +36,7 @@ const clearCookie = (name: string) => {
 
 // ---- initial state (rehydrate token from cookie if on client) ----
 const initialState: AuthState = {
-  token: typeof document !== "undefined" ? readCookie("accessToken") : null,
+  token: typeof document !== "undefined" ? readCookie("access_token") : null,
   user: null,
   initialized: false,
 }
@@ -49,13 +44,10 @@ const initialState: AuthState = {
 const authSlice = createSlice({name: "auth", initialState,
   reducers: {
     /** Save access token and optional user profile */
-    setCredentials: (
-      state,
-      action: PayloadAction<{ accessToken: string; user?: UserInfo }>
-    ) => {
+    setCredentials: ( state, action: PayloadAction<{ accessToken: string; user?: UserInfo }>) => {
       state.token = action.payload.accessToken
       state.user = action.payload.user ?? state.user ?? null
-      writeCookie("accessToken", action.payload.accessToken)
+      writeCookie("access_token", action.payload.accessToken)
     },
 
     /** Update only the user info (e.g., after /me or profile edit) */
@@ -67,13 +59,13 @@ const authSlice = createSlice({name: "auth", initialState,
     signOut: (state) => {
       state.token = null
       state.user = null
-      clearCookie("accessToken")
+      clearCookie("access_token")
     },
 
     /** Optional: call once on app boot to mark slice as ready and pick up cookie */
     initFromCookie: (state) => {
       if (typeof document !== "undefined" && !state.token) {
-        state.token = readCookie("accessToken")
+        state.token = readCookie("access_token")
       }
       state.initialized = true
     },

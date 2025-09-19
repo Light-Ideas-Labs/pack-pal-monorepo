@@ -71,16 +71,19 @@ const getTrip = async (id: string | Types.ObjectId) => {
   }
 
 const listTripsByOwner = async (ownerId: string | Types.ObjectId, pg: PaginationOpts) =>  {
+  console.log("Listing trips for owner:", ownerId, "with pagination:", pg);
     try {
+      
         const page = Math.max(1, pg.page ?? 1);
         const limit = Math.min(100, Math.max(1, pg.limit ?? 20));
         const sort = pg.sort ?? { updatedAt: -1 };
-        
-        return await paginateMongoose( TripModel, { ownerId: ensureObjectId(ownerId, 'ownerId') }, { page, limit, sort });
-  } catch (error) {
-      if (error instanceof ApiError) throw error;
-      throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, "Failed to list trips");
-  }
+
+        const tripList = await paginateMongoose( TripModel, { ownerId: ensureObjectId(ownerId, 'ownerId') }, { page, limit, sort });
+
+        return tripList;
+      } catch (error: any) {
+        console.log("Error listing trips:", error);
+      }
 }
 
 const updateTrip = async (id: string | Types.ObjectId, patch: Partial<{title: string; coverColor: string; startDate: Date | string; endDate: Date | string;}> ) => {
@@ -274,5 +277,6 @@ const compactTripDayOrders = async (tripId: string | Types.ObjectId) => {
     setCollaborator,
     addDay,
     reorderDays,
-    removeDay
+    removeDay,
+    compactTripDayOrders
   }

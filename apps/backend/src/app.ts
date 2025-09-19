@@ -7,35 +7,11 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import { rateLimit } from "express-rate-limit";
-import { 
-  
-  // route/response helpers you can use inside route files (not mounted globally):
-  GeneralError, 
-  ApiError, 
-  ErrorHandler, 
-  unauthenticated, 
-  unauthorized, 
-  baseResponse,
-  CatchAsyncError,
-  flashValidationErrors,
-  uniqueErrorHandler,
-
-
-
-  // middlewares we WILL mount globally below:
-  NotFoundError,
-  errorHandler,
-  syntaxError,
-  removeFavicon,
-  handleErrorsMiddleware,
-
-
-} from "./middlewares/errorHandler";
-
+import { optionalAuth } from "./middlewares/auth.middleware";
+import { NotFoundError, errorHandler, syntaxError, removeFavicon, handleErrorsMiddleware, } from "./middlewares/errorHandler";
 
 // import routes v1
 import { routeV1 } from './routes/index'
-
 
 // api requests limit
 const limiter = rateLimit({
@@ -47,10 +23,9 @@ const limiter = rateLimit({
 
 const app: Express = express();
 
-
 /** Allow dev and prod origins */
 const allowedOrigins = new Set<string>([
-    "https://packpla.travel", // Production frontend with HTTPS
+    "https://packpal.travel", // Production frontend with HTTPS
     "http://localhost:3000",
     "http://localhost:3001", // Local frontend
     "https://your-ngrok-url", // Ngrok for local testing
@@ -64,53 +39,50 @@ const corsOptions: CorsOptions = {
     return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-csrf-token", "x-guest-id"],
   credentials: true,
 };
-
 
 // ───── global non-error middlewares ────────────────────────────────
 app.use(removeFavicon); // remove favicon requests
 app.use(cors(corsOptions));
-app.use(express.json());
 app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(limiter);
+app.use(express.json());
 
 // define the health check route
-app.get('/health', async (req: Request, res: Response): Promise<void> => {
-  try {
-      // Check MongoDB connection status
-      const mongoStatus: boolean = mongoose.connection.readyState === 1;
+// app.get('/health', async (req: Request, res: Response): Promise<void> => {
+//   try {
+//       // Check MongoDB connection status
+//       const mongoStatus: boolean = mongoose.connection.readyState === 1;
 
-      // ToDo: Assuming checkRedisConnection returns a Promise that resolves to a boolean
+//       // ToDo: Assuming checkRedisConnection returns a Promise that resolves to a boolean
 
-
-      if (mongoStatus) {
-          res.status(200).json({ status: 'healthy' });
-      } else {
-          res.status(503).json({ status: 'unhealthy' });
-      }
-  } catch (error: unknown) {
-      // Typing error as unknown, which is safer in TypeScript
-      const errorMessage: string = (error instanceof Error) ? error.message : 'Unknown error';
-      res.status(503).json({ status: 'unhealthy', error: errorMessage });
-  }
-});
-
+//       if (mongoStatus) {
+//           res.status(200).json({ status: 'healthy' });
+//       } else {
+//           res.status(503).json({ status: 'unhealthy' });
+//       }
+//   } catch (error: unknown) {
+//       // Typing error as unknown, which is safer in TypeScript
+//       const errorMessage: string = (error instanceof Error) ? error.message : 'Unknown error';
+//       res.status(503).json({ status: 'unhealthy', error: errorMessage });
+//   }
+// });
 
 // testing api
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({
     success: true,
-    message: "PackPal API is working",
+    message: "PackPal API is running...",
   });
 });
 
+app.use(optionalAuth); // optional auth for all routes below
 app.use(routeV1) // routing v1
 
 // ───── global error middlewares ──────────────────────────────────

@@ -123,6 +123,35 @@ const signIn: RequestHandler = asyncHandler( async (req: Request, res: Response)
     }
 });
 
+const me: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            res.status(401).json({ success: false, message: 'Unauthorized' });
+            return;
+        }
+        const user = await getUserById(userId);
+        if (!user) {
+            res.status(404).json({ success: false, message: 'User not found' });
+            return;
+        }
+        user.salt = undefined;
+        user.passwordHash = undefined;
+        res.status(200).json({ 
+            success: true, 
+            data: user 
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to fetch user data', 
+            error: error instanceof Error ? error.message : error 
+        });
+    }
+});
+
+
+
 const signOut: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
         res.clearCookie("access_token", accessCookieOptions);
@@ -181,23 +210,32 @@ const refreshToken: RequestHandler = asyncHandler(async (req: Request, res: Resp
     try {
         const token = req.cookies.refresh_token;
         if (!token) {
-            res.status(401).json({ error: 'No refresh token provided!' });
+            res.status(401).json({ error: 'session expired! please login again.' });
             return;
         }
 
         if (isTokenExpired(token)) {
             res.status(401).json({ 
-                message: 'Refresh token expired!'
+                message: 'Session expired! please login again.'
             });
             return;
         }
 
         const tokens = await refreshAuth(token);
+
         res.cookie("access_token", tokens.access.token, accessCookieOptions);
         res.cookie("refresh_token", tokens.refresh.token, refreshCookieOptions);
-        next();
+
+        res.status(200).json({ 
+            success: true, 
+            accessToken: tokens.access.token,
+            refreshToken: tokens.refresh.token
+        });
     } catch (error) {
-        res.status(500).json({ message: 'Invalid or expired refresh token', error });
+        res.status(500).json({ 
+            message: 'session refresh failed. please login again.', 
+            error 
+        });
     }
 });
 
@@ -321,6 +359,7 @@ export {
     signUp,
     activateUserAccount,
     signIn,
+    me,
     signOut,
     sendVerificationEmail,
     verifyEmailAccount,

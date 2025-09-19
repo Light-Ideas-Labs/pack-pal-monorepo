@@ -2,11 +2,11 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+
 
 import { MapContext } from "@/context/map-context";
 
-mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!;
+mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAP_BOX_ACCESS_TOKEN!;
 
 type MapComponentProps = {
   mapContainerRef: React.RefObject<HTMLDivElement | null>;
@@ -18,45 +18,45 @@ type MapComponentProps = {
   children?: React.ReactNode;
 };
 
-export default function MapProvider({
-  mapContainerRef,
-  initialViewState,
-  children,
-}: MapComponentProps) {
-  const map = useRef<mapboxgl.Map | null>(null);
+export default function MapProvider({mapContainerRef, initialViewState, children}: MapComponentProps) {
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if (!mapContainerRef.current || map.current) return;
+    if (!mapContainerRef.current || mapRef.current) return;
 
-    map.current = new mapboxgl.Map({
+    const m = new mapboxgl.Map({
       container: mapContainerRef.current,
-      style: "mapbox://styles/mapbox/standard",
+      style: "mapbox://styles/mapbox/streets-v12",
       center: [initialViewState.longitude, initialViewState.latitude],
       zoom: initialViewState.zoom,
       attributionControl: false,
       logoPosition: "bottom-right",
     });
 
-    map.current.on("load", () => {
+    mapRef.current = m;
+    setMap(m); // Set live instance of the map state when the map is initialized - this will trigger a re-render
+
+    m.on("load", () => {
       setLoaded(true);
     });
 
     return () => {
-      if (map.current) {
-        map.current.remove();
-        map.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
       }
     };
   }, [initialViewState, mapContainerRef]);
 
   return (
     <div className="z-[1000]">
-      <MapContext.Provider value={{ map: map.current! }}>
+      <MapContext.Provider value={{ map: mapRef.current! }}>
         {children}
       </MapContext.Provider>
       {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-[1000]">
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-background/60">
           <div className="text-lg font-medium">Loading map...</div>
         </div>
       )}

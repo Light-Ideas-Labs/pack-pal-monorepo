@@ -1,6 +1,6 @@
 import { LocationFeature, iconMap } from "@/lib/mapbox/utils";
 import { cn } from "@/lib/utils";
-import { LocateIcon, MapPin, Navigation, Star, ExternalLink, } from "lucide-react";
+import { LocateIcon, MapPin, Navigation, Star, ExternalLink, LucideIcon, } from "lucide-react";
 
 import { Button } from "./ui/button";
 import Popup from "./map/map-popup";
@@ -27,14 +27,12 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
   const lng = geometry?.coordinates?.[0] || properties?.coordinates?.longitude;
 
   const getIcon = () => {
-    const allKeys = [maki, ...(categories || [])];
+    const keys = [maki, ...(categories || [])].filter(Boolean).map((k) => String(k).toLowerCase());
 
-    for (const key of allKeys) {
-      const lower = key?.toLowerCase();
-      if (iconMap[lower]) return iconMap[lower];
-    }
+    const foundKey = keys.find((key) => iconMap[key]);
+    const Icon: LucideIcon = foundKey ? iconMap[foundKey] : LocateIcon;
 
-    return <LocateIcon className="h-5 w-5" />;
+    return <Icon className="h-5 w-5" />;
   };
 
   return (
@@ -50,17 +48,17 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
     >
       <div className="w-[300px] sm:w-[350px]">
         <div className="flex items-start gap-3">
-          <div className="bg-rose-500/10 p-2 rounded-full shrink-0">
+          <div className="shrink-0 rounded-full p-2 bg-brand-500/10 text-brand-600 dark:text-brand-400">
             {getIcon()}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between gap-1">
-              <h3 className="font-medium text-base truncate">{name}</h3>
+            <div className="mb-0.5 flex items-center justify-between gap-2">
+              <h3 className="truncate text-base font-semibold leading-tight">{name}</h3>
               {status && (
                 <Badge
                   variant={status === "active" ? "outline" : "secondary"}
                   className={cn(
-                    "text-xs",
+                    "h-5 rounded-full px-2 text-[10px] font-medium",
                     status === "active" ? "border-green-500 text-green-600" : ""
                   )}
                 >
@@ -75,7 +73,7 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
             )}
             {address && (
               <p className="text-sm text-muted-foreground truncate mt-1">
-                <MapPin className="h-3 w-3 inline mr-1 opacity-70" />
+                <MapPin className="mr-1 inline h-3 w-3 opacity-70" />
                 {address}
               </p>
             )}
@@ -83,12 +81,12 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
         </div>
 
         {categories.length > 0 && (
-          <div className="mt-3 flex flex-wrap gap-1 max-w-full">
+          <div className="mt-3 flex max-w-full flex-wrap gap-1">
             {categories.slice(0, 3).map((category, index) => (
               <Badge
                 key={index}
                 variant="secondary"
-                className="text-xs capitalize truncate max-w-[100px]"
+                className="max-w-[100px] truncate text-xs capitalize"
               >
                 {category}
               </Badge>
@@ -107,7 +105,7 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center justify-center"
+            className="justify-center"
             onClick={() => {
               window.open(
                 `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`,
@@ -115,14 +113,14 @@ export function LocationPopup({ location, onClose }: LocationPopupProps) {
               );
             }}
           >
-            <Navigation className="h-4 w-4 mr-1.5" />
+            <Navigation className="mr-1.5 h-4 w-4" />
             Directions
           </Button>
 
           <Button
             variant="outline"
             size="sm"
-            className="flex items-center justify-center"
+            className="justify-center"
             onClick={() => {
               console.log("Saved location:", location);
             }}

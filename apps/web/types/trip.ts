@@ -3,10 +3,10 @@ export type TripColor = "peach" | "lavender" | "mint" | "sun" | "ocean" | "grape
 export interface Trip {
   id: string;
   title: string;
+  destination?: string;
   startDate: string; // ISO
   endDate: string;   // ISO
-  color: TripColor;
-  city?: string;
+  coverColor: TripColor;
   coverUrl?: string | null; // optional cover image URL
   placesCount?: number; // number of places saved in trip
 }

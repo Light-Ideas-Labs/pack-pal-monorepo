@@ -30,12 +30,7 @@ export const refreshCookieOptions: Partial<CookieOptions> = {
 };
 
 // Send token function
-export const sendToken = async (
-  res: Response,
-  message: string,
-  user: UserDocument,
-  statusCode: number
-): Promise<Response> => {
+export const sendToken = async (res: Response, message: string, user: UserDocument, statusCode: number): Promise<Response> => {
   try {
     const tokens = await generateAuthTokens(user);
     const accessToken = tokens.access.token;

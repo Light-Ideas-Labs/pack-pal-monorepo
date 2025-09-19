@@ -10,11 +10,11 @@ type TripColor = "peach" | "lavender" | "mint" | "sun" | "ocean" | "grape";
 type CardTrip = {
   id: string;
   title: string;
+  destination?: string;
   startDate: string;
   endDate: string;
-  city?: string;
   coverUrl?: string | null;
-  color: TripColor;
+  coverColor: TripColor;
   placesCount?: number;
 };
 
@@ -43,7 +43,7 @@ export function TripCard({ trip }: { trip: CardTrip }) {
     <Link href={href} className="group block focus:outline-none">
       <article className="overflow-hidden rounded-2xl border bg-card shadow-sm transition group-hover:shadow-md focus-visible:ring-2">
         {/* Cover */}
-        <div className="relative h-40 w-full" style={{ backgroundColor: trip.coverUrl ? undefined : COLOR_BG[trip.color] }}>
+        <div className="relative h-40 w-full" style={{ backgroundColor: trip.coverUrl ? undefined : COLOR_BG[trip.coverColor] }}>
           {trip.coverUrl && (
           <Image
             src={trip.coverUrl}
@@ -59,7 +59,7 @@ export function TripCard({ trip }: { trip: CardTrip }) {
           <div className="absolute left-2 top-2 flex gap-2">
             <span className="inline-flex items-center gap-1 rounded-full bg-background/90 px-2 py-1 text-xs shadow ring-1 ring-border">
               <MapPin className="h-3 w-3" />
-              {trip.city ?? "—"}
+              {trip.destination ?? "—"}
             </span>
             <span className="inline-flex items-center gap-1 rounded-full bg-background/90 px-2 py-1 text-xs shadow ring-1 ring-border">
               <Map className="h-3 w-3" />
@@ -79,7 +79,7 @@ export function TripCard({ trip }: { trip: CardTrip }) {
       <div className="p-4">
         <div className="text-xs text-muted-foreground">{dateRange}</div>
         <h3 className="mt-1 text-lg font-semibold">{trip.title}</h3>
-        {trip.city && <p className="text-sm text-muted-foreground">{trip.city}</p>}
+        {trip.destination && <p className="text-sm text-muted-foreground">{trip.destination}</p>}
         {trip.placesCount !== undefined && (
           <p className="mt-2 text-sm text-muted-foreground">
             {trip.placesCount} {trip.placesCount === 1 ? "place" : "places"} saved

@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { Request, Response, RequestHandler } from 'express';
 import asyncHandler from "express-async-handler";
 import * as UserService from '../services/users.service';
 

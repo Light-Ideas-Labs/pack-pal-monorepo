@@ -2,6 +2,7 @@ import express, { Router } from "express"
 const routing: Router = express.Router();
 
 // v1 routes imports
+import healthRoutes from "./health.routes";
 import docsRoute from "./docs.routes";
 import authRoutes from "./auth.routes";
 import userRoutes from "./users.route"
@@ -21,5 +22,7 @@ routing.use("/api/v1/subscription", subscriptionRoutes);
 routing.use("/api/v1", travelRequirementRoutes);
 routing.use("/api/v1/watchlist", watchlistRoutes);
 
+// internal routes v1 health check
+routing.use(healthRoutes);
 
 export default routing;

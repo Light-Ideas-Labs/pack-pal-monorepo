@@ -1,4 +1,3 @@
-// components/auth/signin-form.tsx
 "use client";
 
 import * as React from "react";
@@ -20,10 +19,10 @@ import GoogleSignInButton from "../social-buttons/google-auth-button";
 function roleToPath(role?: string | null) {
   const r = (role ?? "").toLowerCase();
   if (r === "admin") return "/admin/overview";
-  if (r === "customer") return "/account";
+  if (r === "customer") return "/trips/list";
   if (r === "vendor") return "/vendor";
   if (r === "guest") return "/guest";
-  return "/account";
+  return "/trips/list"; // default to customer home
 }
 
 export function SignInForm({className, ...props}: React.ComponentProps<"div">) {

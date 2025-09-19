@@ -30,13 +30,16 @@ const UseOfFundsSchema = new Schema({
 const TripSchema = new Schema({
   ownerId: { type: Schema.Types.ObjectId, ref: 'Users', required: true, index: true },
   title: { type: String, required: true },
+  destination: { type: String },
   coverColor: { type: String, default: '#6b7280' },
   startDate: { type: Date, required: true },
   endDate: { type: Date, required: true },
   documents: [TripDocumentSchema],
   packingItems: [PackingItemSchema],
   collaborations: [TripCollaboratorSchema],
-  useOfFunds: [UseOfFundsSchema]
+  useOfFunds: [UseOfFundsSchema],
+  visibility: { type: String, enum: ['private', 'public', 'friends'], default: 'private' },
+  invites: [{ type: Schema.Types.ObjectId, ref: 'Users' }]
 }, { timestamps: true, versionKey: false });
 
 TripSchema.virtual('days').get(function () {

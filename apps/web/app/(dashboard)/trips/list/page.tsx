@@ -7,7 +7,7 @@ import { trips } from "@/lib/demo";
 
 export default function TripsPage() {
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-3xl font-bold">Recently viewed and upcoming</h1>
 
@@ -29,9 +29,9 @@ export default function TripsPage() {
               title: t.title,
               startDate: t.startDate,
               endDate: t.endDate,
-              city: t.city,
+              destination: t.destination,
               coverUrl: t.coverUrl ?? undefined, // if you have it
-              color: t.color ?? "lavender", // fallback color
+              coverColor: t.coverColor ?? "lavender", // fallback color
               placesCount: t.placesCount,
             }}
           />

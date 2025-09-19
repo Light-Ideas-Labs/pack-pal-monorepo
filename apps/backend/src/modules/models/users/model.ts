@@ -67,7 +67,8 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     bookmarks: { type: mongoose.Schema.Types.ObjectId },
     tokens: { type: Array, default: [] },
     trips: [{ tripId: String }],
-    role: { type: String, default: "user" },
+    role: { type: String, default: "user" }, // "user" | "admin" | "traveler"
+    collaborations: [{ userId: String, status: String }], // "pending" | "accepted" | "rejected"
     subscription: {
       status: { type: String, enum: ["active", "inactive"], default: "inactive" },
       plan: { type: String, default: "free" },

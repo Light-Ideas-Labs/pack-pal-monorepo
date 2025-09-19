@@ -1,0 +1,409 @@
+{
+  "info": {
+    "name": "PackPal API (v1)",
+    "_postman_id": "2bb1f4c6-0c7b-4a7b-a1b6-pp-col-v1",
+    "description": "Postman collection for PackPal backend. Uses {{baseUrl}} and {{accessToken}} variables.\nSet {{baseUrl}} to http://localhost:4000/api/v1 for local dev.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:4000/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "tripId", "value": "" },
+    { "key": "documentId", "value": "" },
+    { "key": "itemId", "value": "" },
+    { "key": "collabUserId", "value": "" },
+    { "key": "dayId1", "value": "" },
+    { "key": "dayId2", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health & Root",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+        },
+        {
+          "name": "GET / (root ping)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/.." }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /auth/signup",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/signup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"email\": \"test+{{$timestamp}}@example.com\",\n  \"password\": \"P@ssw0rd!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/signin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json() || {};",
+                  "// Your backend returns tokens at the top level: { accessToken, refreshToken, user }",
+                  "if (json.accessToken) {",
+                  "  pm.collectionVariables.set('accessToken', json.accessToken);",
+                  "  console.log('accessToken set from signin');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/signin",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"P@ssw0rd!\"\n}" }
+          }
+        },
+        {
+          "name": "GET /auth/me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "POST /auth/refresh-token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/refresh-token"
+          }
+        },
+        {
+          "name": "POST /auth/forgot-password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/forgot-password",
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"test@example.com\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plans",
+      "item": [
+        {
+          "name": "GET /plans",
+          "request": { "method": "GET", "url": "{{baseUrl}}/plans" }
+        },
+        {
+          "name": "GET /plans/:name",
+          "request": { "method": "GET", "url": "{{baseUrl}}/plans/free" }
+        },
+        {
+          "name": "POST /plans (admin-ish)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/plans",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"pro\",\n  \"price\": 990\n}" }
+          }
+        },
+        {
+          "name": "PUT /plans (upsert plan)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/plans",
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"teams\",\n  \"price\": 4990\n}" }
+          }
+        },
+        {
+          "name": "DELETE /plans/:name",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/plans/free"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Trips",
+      "item": [
+        {
+          "name": "POST /trips (create)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json() || {};",
+                  "const id = json?.data?._id || json?.data?.id || json?._id || json?.id;",
+                  "if (id) { pm.collectionVariables.set('tripId', id); console.log('tripId=', id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/trips",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Trip to Nairobi\",\n  \"startDate\": \"2025-09-18\",\n  \"endDate\": \"2025-09-30\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /trips (list)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/trips?page=1&limit=20"
+          }
+        },
+        {
+          "name": "GET /trips/:id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/trips/{{tripId}}"
+          }
+        },
+        {
+          "name": "PUT /trips/:id (update)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/trips/{{tripId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Trip to Naivasha\"\n}" }
+          }
+        },
+        {
+          "name": "Documents",
+          "item": [
+            {
+              "name": "POST /trips/:id/documents (add)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json() || {};",
+                      "const docId = json?.data?._id || json?.data?.id;",
+                      "if (docId) { pm.collectionVariables.set('documentId', docId); console.log('documentId=', docId); }"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": "{{baseUrl}}/trips/{{tripId}}/documents",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"E-ticket.pdf\",\n  \"url\": \"https://files.example/eticket.pdf\",\n  \"size\": 123456,\n  \"mimeType\": \"application/pdf\"\n}"
+                }
+              }
+            },
+            {
+              "name": "DELETE /trips/:id/documents/:documentId",
+              "request": {
+                "method": "DELETE",
+                "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+                "url": "{{baseUrl}}/trips/{{tripId}}/documents/{{documentId}}"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Packing",
+          "item": [
+            {
+              "name": "POST /trips/:id/packing-items (add item)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json() || {};",
+                      "const it = json?.data?._id || json?.data?.id;",
+                      "if (it) { pm.collectionVariables.set('itemId', it); console.log('itemId=', it); }"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": "{{baseUrl}}/trips/{{tripId}}/packing-items",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Sunscreen\",\n  \"quantity\": 1,\n  \"category\": \"Toiletries\"\n}"
+                }
+              }
+            },
+            {
+              "name": "PATCH /trips/:id/packing-items/:itemId/toggle",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": "{{baseUrl}}/trips/{{tripId}}/packing-items/{{itemId}}/toggle",
+                "body": { "mode": "raw", "raw": "{ \"checked\": true }" }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Collaborators",
+          "item": [
+            {
+              "name": "POST /trips/:id/collaborators (set)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": "{{baseUrl}}/trips/{{tripId}}/collaborators",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": \"{{collabUserId}}\",\n  \"role\": \"editor\",\n  \"status\": \"invited\"\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Days",
+          "item": [
+            {
+              "name": "POST /trips/:id/days (add day)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json() || {};",
+                      "const d = json?.data?._id || json?.data?.id;",
+                      "if (d && !pm.collectionVariables.get('dayId1')) pm.collectionVariables.set('dayId1', d);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": "{{baseUrl}}/trips/{{tripId}}/days",
+                "body": { "mode": "raw", "raw": "{\n  \"date\": \"2025-09-20\",\n  \"activities\": []\n}" }
+              }
+            },
+            {
+              "name": "PATCH /trips/:id/days/reorder",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+                  { "key": "Content-Type", "value": "application/json" }
+                ],
+                "url": "{{baseUrl}}/trips/{{tripId}}/days/reorder",
+                "body": { "mode": "raw", "raw": "{\n  \"dayOrder\": [\"{{dayId1}}\",\"{{dayId2}}\"]\n}" }
+              }
+            },
+            {
+              "name": "POST /trips/:id/remove/day",
+              "request": {
+                "method": "POST",
+                "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+                "url": "{{baseUrl}}/trips/{{tripId}}/remove/day"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "GET /subscription",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/subscription"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Travel Requirements",
+      "item": [
+        {
+          "name": "GET /requirements?from=KE&to=IT",
+          "request": { "method": "GET", "url": "{{baseUrl}}/requirements?from=KE&to=IT" }
+        }
+      ]
+    },
+    {
+      "name": "Watchlist",
+      "item": [
+        {
+          "name": "GET /watchlist",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/watchlist"
+          }
+        },
+        {
+          "name": "POST /watchlist",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/watchlist",
+            "body": { "mode": "raw", "raw": "{\n  \"placeId\": \"mapbox:poi:123\",\n  \"label\": \"Lake Naivasha\"\n}" }
+          }
+        }
+      ]
+    }
+  ]
+}

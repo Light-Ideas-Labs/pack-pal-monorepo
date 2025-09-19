@@ -1,5 +1,6 @@
 import express, { Router } from "express";
-import { signUp, activateUserAccount, signIn, signOut, sendVerificationEmail, verifyEmailAccount, refreshToken, forgotPasswordLink, newPassword, changePassword } from "../../modules/controllers/auth.controller";
+import { signUp, activateUserAccount, signIn, me, signOut, sendVerificationEmail, verifyEmailAccount, refreshToken, forgotPasswordLink, newPassword, changePassword } from "../../modules/controllers/auth.controller";
+import { requireAuth } from "../../middlewares/auth.middleware";
 
 const router: Router = express.Router();
 
@@ -75,6 +76,21 @@ router.post('/activate-account', activateUserAccount);
  *         description: User signed in successfully
  */
 router.post('/signin', signIn);
+
+/**
+ * @openapi
+ * /api/v1/auth/me:
+ *   get:
+ *     tags:
+ *       - Auth
+ *     summary: Get current user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user fetched successfully
+ */
+router.get('/me', requireAuth, me);
 
 /**
  * @openapi

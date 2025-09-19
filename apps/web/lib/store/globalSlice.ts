@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 /* ---------- Types ---------- */
 
-type Role = "ADMIN" | "STAFF" | "CUSTOMER" | "GUEST" | null
+type Role = "ADMIN" | "TRAVELER" | "GUEST" | null
 type Status = "ACTIVE" | "INACTIVE" | "PENDING" | null
 
 type LoginPayload = {
@@ -15,7 +15,7 @@ type LoginPayload = {
 }
 
 type MePayload = {
-  role: "Admin" | "Staff" | "Customer"
+  role: "Admin" | "Traveler"
   status: "active" | "inactive" | "pending"
   email: string
   username: string
@@ -66,7 +66,7 @@ const clearCookie = (name: string) => {
   document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`
 }
 
-const toRole = (r: "Admin" | "Staff" | "Customer"): Exclude<Role, "GUEST" | null> =>
+const toRole = (r: "Admin" | "Traveler"): Exclude<Role, "GUEST" | null> =>
   r.toUpperCase() as Exclude<Role, "GUEST" | null>
 
 const toStatus = (s: "active" | "inactive" | "pending"): Exclude<Status, null> =>

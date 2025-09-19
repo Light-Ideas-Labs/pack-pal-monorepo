@@ -4,19 +4,25 @@ export type Trip = { _id: string; title: string; startDate: string; endDate: str
 
 export const tripsApi = api.injectEndpoints({
   endpoints: (build) => ({
-    createTrip: build.mutation<{ success: boolean; data: Trip }, {title: string; destination?: string; startDate: string; endDate: string;}>({
-      query: (body) => ({ url: "/trips", method: "POST", body }),
+    createTrip: build.mutation<{ success: boolean; data: Trip }, {title: string; destination?: string; startDate: string; endDate: string; coverColor?: string; invites?: string[], visibility?: "private" | "public" | "friends"}>({
+      query: (body) => ({ url: "/trips/create", method: "POST", body }),
       invalidatesTags: ["Trips"],
     }),
     listTrips: build.query<{ success: boolean; data: Trip[] }, { page?: number; limit?: number } | void>({
       query: (q) => {
         const params = new URLSearchParams();
-        if (q && q.page) params.set("page", String(q.page));
-        if (q && q.limit) params.set("limit", String(q.limit));
+        if (q?.page) params.set("page", String(q.page));
+        if (q?.limit) params.set("limit", String(q.limit));
         const suffix = params.toString() ? `?${params}` : "";
-        return { url: `/trips${suffix}`, method: "GET" };
+        return { url: `/trips/list${suffix}`, method: "GET" };
       },
-      providesTags: ["Trips"],
+      providesTags: (res) =>
+        res?.data
+          ? [
+              { type: "Trips", id: "LIST" },
+              ...res.data.map((t) => ({ type: "Trips" as const, id: t._id })),
+            ]
+          : [{ type: "Trips", id: "LIST" }],
     }),
     getTrip: build.query<{ success: boolean; data: Trip }, string>({
       query: (id) => ({ url: `/trips/${id}`, method: "GET" }),

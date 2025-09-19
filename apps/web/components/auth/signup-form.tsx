@@ -127,7 +127,7 @@ export function SignUpForm({ redirectTo, ...formProps }: Props) {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input type="password" autoComplete="new-password" {...field} />
-                    {/* <Button
+                    <Button
                       type="button"
                       variant="ghost"
                       size="icon"
@@ -135,7 +135,7 @@ export function SignUpForm({ redirectTo, ...formProps }: Props) {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </Button> */}
+                    </Button>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -149,7 +149,7 @@ export function SignUpForm({ redirectTo, ...formProps }: Props) {
                   <FormLabel>Confirm password</FormLabel>
                   <FormControl>
                     <Input type="password" autoComplete="new-password" {...field} />
-                    {/* <Button
+                    <Button
                       type="button"
                       variant="ghost"
                       size="icon"
@@ -157,7 +157,7 @@ export function SignUpForm({ redirectTo, ...formProps }: Props) {
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                    </Button> */}
+                    </Button>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

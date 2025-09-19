@@ -1,5 +1,6 @@
 import { api } from "../store/api"
 import { loginSuccess, setAccessToken, logoutToGuest } from "../store/globalSlice"
+import { setCredentials, setUser } from "../store/authSlice"
 
 type ForgotPasswordResponse = {
   success: boolean;
@@ -22,9 +23,6 @@ type SignUpBody = {
     email: string;
     password: string;
     avatar?: string;
-    gender?: string;
-    website?: string;
-    picture?: string;
 }
 type ActivateBody = {
     activation_token: string;
@@ -40,7 +38,7 @@ type AuthPayload = {
   accessToken: string;
   refreshToken: string;
   user: {
-    role: string; // "admin" | "staff" | "customer" (lowercase from API)
+    role: string; // "admin" | "traveler" (lowercase from API)
     email: string
     username: string
     status: string;   // "ACTIVE" | "INACTIVE" | "PENDING"
@@ -64,7 +62,7 @@ export const authApi = api.injectEndpoints({
       async onQueryStarted(_, { dispatch, queryFulfilled }) {
         const { data } = await queryFulfilled
 
-        const roleU = String(data.user.role || "customer").toUpperCase() as | "ADMIN" | "STAFF" | "CUSTOMER";
+        const roleU = String(data.user.role || "customer").toUpperCase() as | "ADMIN" | "TRAVELER";
         
         const statusU = (data.user.status ? String(data.user.status) : "ACTIVE").toUpperCase() as "ACTIVE" | "INACTIVE" | "PENDING";
         
@@ -79,19 +77,45 @@ export const authApi = api.injectEndpoints({
           ].filter(Boolean).join("; ");
         }
 
-    dispatch(
-      loginSuccess({
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
-        role: roleU,
-        status: statusU,
-        email: data.user.email,
-        username: data.user.username,
-          }),
-        )
-      },
+    dispatch(loginSuccess({
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken,
+      role: roleU,
+      status: statusU,
+      email: data.user.email,
+      username: data.user.username,
+    }));
+    
+    // ✅ authSlice (used by api.ts → Authorization header + writes access_token cookie)
+    dispatch(setCredentials({ accessToken: data.accessToken, user: {
+      id: data.user.id ?? data.user._id,
+      role: data.user.role,
+      status: data.user.status,
+      email: data.user.email,
+      userName: data.user.username 
+    }}));
+  },
       invalidatesTags: ["Auth", "Users", "Plans", "FeatureMatrix", "Watchlist", "Trips", "TripDays", "TravelRequirements"],
     }),
+
+
+    me: builder.query<{ success: boolean; data: { id: string; email: string; username: string; role: string; status: string; avatarUrl?: string | null } }, void>({
+      query: () => ({ url: "/auth/me", method: "GET" }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        const { data } = await queryFulfilled;
+        // hydrate slices if you want
+        dispatch(setUser({
+          id: data.data.id,
+          email: data.data.email,
+          userName: data.data.username,
+          role: data.data.role,
+          status: data.data.status,
+          avatarUrl: data.data.avatarUrl ?? undefined,
+        }));
+      },
+      providesTags: ["Auth"],
+    }),
+
 
     signOut: builder.mutation<{ success: boolean }, void>({
       query: () => ({ url: "/auth/signout", method: "POST" }),
@@ -141,6 +165,7 @@ export const {
   useSignUpMutation,
   useActivateAccountMutation,
   useSignInMutation,
+  useMeQuery,
   useSignOutMutation,
   useRefreshTokenMutation,
   useSendVerificationEmailMutation,
