@@ -10,7 +10,7 @@ import { requireAuth, authorizeRoles, requireUserOrGuest } from '../../middlewar
 const router: Router = express.Router();
 
 router.post('/create', requireAuth, createTripHandler);
-router.get('/:id', requireAuth, getTripHandler);
+router.get('/:id/trip', requireAuth, getTripHandler);
 router.get('/list', requireAuth, listTripsHandler);
 router.put('/:id', requireAuth, updateTripHandler);
 router.post('/:id/documents', requireAuth, addDocumentHandler);

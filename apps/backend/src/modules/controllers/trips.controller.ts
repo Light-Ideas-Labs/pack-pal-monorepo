@@ -21,8 +21,9 @@ const parseSort = (raw: unknown): Record<string, 1 | -1> => {
 // Create a new trip
 const createTripHandler: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
     try {
-    const { title, destination, startDate, endDate } = req.body;
+    const { title, destination, coverColor, startDate, endDate } = req.body;
     const ownerId = req.user?.id;
+    console.log("ownerId:", ownerId);
     if (!ownerId) {
         res.status(401).json({ success: false, message: 'Unauthorized' });
         return;
@@ -36,7 +37,7 @@ const createTripHandler: RequestHandler = asyncHandler(async (req: Request, res:
     }
 
     // TODO: validate date formats, destination, etc.
-    const trip = await createTrip({ title, startDate, endDate, ownerId });
+    const trip = await createTrip({ ownerId, title, destination, coverColor, startDate, endDate });
     res.status(201).json({ success: true, data: trip });
     } catch (error) {
         res.status(500).json({ 

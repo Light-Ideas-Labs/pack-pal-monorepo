@@ -1,6 +1,8 @@
 import mongoose, { Schema, Types } from 'mongoose';
 
 export type Role = 'OWNER' | 'EDITOR' | 'VIEWER' | 'CONTRIBUTOR';
+export type TripVisibility = 'private' | 'public' | 'friends';
+export type TripColor = 'peach' | 'lavender' | 'mint' | 'sun' | 'ocean' | 'grape';
 
 const TripCollaboratorSchema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'Users', required: true },
@@ -27,6 +29,14 @@ const UseOfFundsSchema = new Schema({
   percentage: { type: Number, min: 0, max: 100 }
 }, { _id: false });
 
+/** optional: a lightweight itinerary item */
+const ItineraryItemSchema = new Schema({
+  time: String,                  // "09:30"
+  title: { type: String, required: true },
+  description: String,
+  location: String,
+}, { _id: true, timestamps: true });
+
 const TripSchema = new Schema({
   ownerId: { type: Schema.Types.ObjectId, ref: 'Users', required: true, index: true },
   title: { type: String, required: true },
@@ -39,7 +49,10 @@ const TripSchema = new Schema({
   collaborations: [TripCollaboratorSchema],
   useOfFunds: [UseOfFundsSchema],
   visibility: { type: String, enum: ['private', 'public', 'friends'], default: 'private' },
-  invites: [{ type: Schema.Types.ObjectId, ref: 'Users' }]
+  invites: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
+  itinerary: [ItineraryItemSchema],
+  coverUrl: { type: String, default: null },
+  placesCount: { type: Number, default: 0 }, // denormalized count of places if you want a quick pill on trip card
 }, { timestamps: true, versionKey: false });
 
 TripSchema.virtual('days').get(function () {

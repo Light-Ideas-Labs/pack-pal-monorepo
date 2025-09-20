@@ -36,7 +36,7 @@ export type PaginationOpts = {
 };
 
 /* ── Trips ───────────────────── */
-const createTrip = (opts: { ownerId: string | Types.ObjectId; title: string; coverColor?: string; startDate: Date | string; endDate: Date | string; }) => {
+const createTrip = (opts: { ownerId: string | Types.ObjectId; title: string; coverColor: string; destination: string; startDate: Date | string; endDate: Date | string; }) => {
     try {
     return withSession(async (s) => {
       const trip = await TripModel.create(
@@ -44,6 +44,7 @@ const createTrip = (opts: { ownerId: string | Types.ObjectId; title: string; cov
           {
             ownerId: ensureObjectId(opts.ownerId, 'ownerId'),
             title: opts.title,
+            destination: opts.destination ?? '',
             coverColor: opts.coverColor ?? '#6b7280',
             startDate: new Date(opts.startDate),
             endDate: new Date(opts.endDate),

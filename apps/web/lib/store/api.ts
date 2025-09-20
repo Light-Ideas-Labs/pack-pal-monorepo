@@ -7,7 +7,7 @@ import type { ApiEnvelope } from "@/types";
 type FetchMethod = "GET"|"POST"|"PATCH"|"PUT"|"DELETE";
 const isMutating = (m?: string) => (["POST","PATCH","PUT","DELETE"] as FetchMethod[]).includes((m||"GET").toUpperCase() as FetchMethod)
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE;
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api/v1";
 console.log("[api] baseUrl:", baseUrl);
 
 /** public endpoints that should Never trigger refresh */
@@ -68,20 +68,23 @@ const rawBase = fetchBaseQuery({
   baseUrl,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
-    const { user } = (getState() as RootState).global;
-    const token = (getState() as any).auth?.token as string | null;  // adjust to your actual slice property
+    const state = getState() as RootState;
+    const token =  state.global?.user?.accessToken ?? (state as any).auth?.token;  // adjust to your actual slice property
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
-    } else if (user?.guestId) {
-      headers.set("x-guest-id", user.guestId); // backend: map to requireUserOrGuest
-    }
-    return headers;
+    } 
+    
+      const guestId = state.global?.user?.guestId;
+      if (!token && guestId) headers.set("x-guest-id", guestId);
+
+  return headers;
   },
 });
 
 const customBaseQuery = async (args: string | FetchArgs, api: BaseQueryApi, extra: object) => {
-  const method = typeof args === "string" ? undefined : args.method;
+  const method = typeof args === "string" ? "GET" : (args.method ?? "GET");
   const url = (typeof args === "string" ? args : args.url) || "";
+  console.log("[api] REQUEST ->", method, new URL(url, baseUrl).toString());
 
   let res = await rawBase(args, api, extra);
 

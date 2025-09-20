@@ -1,15 +1,26 @@
 export type TripColor = "peach" | "lavender" | "mint" | "sun" | "ocean" | "grape";
 
-export interface Trip {
-  id: string;
+export type Trip = { 
+  _id: string; 
   title: string;
-  destination?: string;
-  startDate: string; // ISO
-  endDate: string;   // ISO
-  coverColor: TripColor;
-  coverUrl?: string | null; // optional cover image URL
-  placesCount?: number; // number of places saved in trip
-}
+  startDate: string; 
+  endDate: string; 
+  destination: string; 
+  coverUrl?: string | null;
+  coverColor: string | TripColor; 
+  placesCount?: number; 
+  itinerary?: ItineraryItem[];
+  documents?: any[]; 
+  packingItems?: any[]; 
+  collaborations?: any[]; 
+  useOfFunds?: any[]; 
+  visibility: "private" | "public" | "friends"; 
+  invites?: string[]; 
+  createdAt: string; 
+  updatedAt: string; 
+  days?: number
+ };
+
 
 export interface ItineraryItem {
   id: string;
@@ -34,3 +45,4 @@ export interface TripDoc {
   type: "pdf" | "image" | "ticket";
   sizeKB: number;
 }
+

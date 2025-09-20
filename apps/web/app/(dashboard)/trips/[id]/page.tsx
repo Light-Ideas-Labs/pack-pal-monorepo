@@ -7,25 +7,35 @@ import * as Icons from "lucide-react";
 import { Sidebar, TripHeader, Explore, Reservations, Budget, Notes, MapPanel, } from "@/components/trips";
 import { useGetTripQuery } from "@/lib/api/tripsApi";  // <- RTKQ hook
 
-type PageProps = { params: { id: string } };
+type PageProps = { params: Promise<{ id: string }> };
 
-export default async function TripPlannerPage({ params }: PageProps) {
-  const { id } = await params;                    // <-- await the promise
-  const decodedId = decodeURIComponent(id);
-  const { data, isLoading, isError } = useGetTripQuery(decodedId);
-  const trip =
-    data?.data ??
-    ({
-      _id: decodedId,
-      title: "Untitled trip",
-      startDate: "",
-      endDate: "",
-      coverUrl: undefined,
-    } as const);
+export default function TripPlannerPage({ params }: PageProps) {
+  const { id } =  use(params); // <-- await the promise
+  const tripId = decodeURIComponent(id);
+
   const [showSidebar, setShowSidebar] = useState(true);
 
   // Replace with RTKQ hooks
+  const { data, isLoading, isError, refetch } = useGetTripQuery(tripId, { refetchOnFocus: true, refetchOnReconnect: true, });
 
+  if (isLoading) {
+    return (
+      <div className="flex h-dvh items-center justify-center">
+        <div className="animate-pulse text-sm text-muted-foreground">Loading trip…</div>
+      </div>
+    );
+  }
+
+  if (isError || !data?.data) {
+    return (
+      <div className="flex h-dvh flex-col items-center justify-center gap-3">
+        <p className="text-sm text-muted-foreground">Couldn’t load this trip.</p>
+        <Button size="sm" onClick={() => refetch()}>Try again</Button>
+      </div>
+    );
+  }
+
+  const trip = data.data;
 
   return (
     <div className="flex h-dvh flex-col">

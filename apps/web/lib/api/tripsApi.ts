@@ -1,14 +1,30 @@
 import { api } from "../store/api";
+import { Trip } from "../../types";
 
-export type Trip = { _id: string; title: string; startDate: string; endDate: string; [k: string]: any };
+type Paginated<T> = {
+  data: T[];
+  _links: any;
+  _meta: any
+};
+
 
 export const tripsApi = api.injectEndpoints({
   endpoints: (build) => ({
-    createTrip: build.mutation<{ success: boolean; data: Trip }, {title: string; destination?: string; startDate: string; endDate: string; coverColor?: string; invites?: string[], visibility?: "private" | "public" | "friends"}>({
+    createTrip: build.mutation<{ success: boolean; data: Trip }, 
+    {title: string; destination?: string; startDate: string; endDate: string; coverColor?: string; invites?: string[], visibility?: "private" | "public" | "friends"}>({
       query: (body) => ({ url: "/trips/create", method: "POST", body }),
+        async onQueryStarted(arg, { queryFulfilled }) {
+    console.log("[RTKQ] createTrip fired with:", arg);
+    try {
+      const { data } = await queryFulfilled;
+      console.log("[RTKQ] createTrip success:", data);
+    } catch (e) {
+      console.error("[RTKQ] createTrip error:", e);
+    }
+  },
       invalidatesTags: ["Trips"],
     }),
-    listTrips: build.query<{ success: boolean; data: Trip[] }, { page?: number; limit?: number } | void>({
+    listTrips: build.query<{ success: boolean; data: Paginated<Trip> }, { page?: number; limit?: number } | void>({
       query: (q) => {
         const params = new URLSearchParams();
         if (q?.page) params.set("page", String(q.page));
@@ -17,15 +33,15 @@ export const tripsApi = api.injectEndpoints({
         return { url: `/trips/list${suffix}`, method: "GET" };
       },
       providesTags: (res) =>
-        res?.data
+        res?.data.data
           ? [
               { type: "Trips", id: "LIST" },
-              ...res.data.map((t) => ({ type: "Trips" as const, id: t._id })),
+              ...res.data.data.map((t) => ({ type: "Trips" as const, id: t._id })),
             ]
           : [{ type: "Trips", id: "LIST" }],
     }),
     getTrip: build.query<{ success: boolean; data: Trip }, string>({
-      query: (id) => ({ url: `/trips/${id}`, method: "GET" }),
+      query: (id) => ({ url: `/trips/${id}/trip`, method: "GET" }),
       providesTags: (_r, _e, id) => [{ type: "Trips", id }],
     }),
     updateTrip: build.mutation<{ success: boolean; data: Trip }, { id: string; updates: Partial<Trip> }>({

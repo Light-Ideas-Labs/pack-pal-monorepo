@@ -11,11 +11,10 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import DestinationAutocomplete from "@/components/trips/destination-auto-complete";
 
 // wire to your RTKQ mutation
 import { useCreateTripMutation } from "@/lib/api/tripsApi"; // <- adjust import
-import { useAppDispatch, useAppSelector } from "@/lib/store/StoreProvider";
-import { selectToken } from "@/lib/store/authSlice";
 import { NewTripSchema, type TripsFormInput, type TripsFormValues } from "@/lib/validation/trip";
 import { toast } from "sonner";
 
@@ -28,9 +27,8 @@ const COLOR_HEX: Record<TripsFormValues["coverColor"], string> = {
   grape: "#D9C2FF",
 }
 
-type Props = React.ComponentProps<"form"> & { redirectTo?: string };
 
-export default function NewTripForm({ redirectTo, ...formProps }: Props) {
+export default function NewTripForm() {
   const router = useRouter();
   const [createTrip, { isLoading, error }] = useCreateTripMutation();
 
@@ -47,10 +45,17 @@ export default function NewTripForm({ redirectTo, ...formProps }: Props) {
     },
   });
 
+  // live preview (optional)
+  const watchTitle = form.watch("title");
+  const watchDest = form.watch("destination");
+  const preview =  `${(watchTitle?.trim() || "Untitled getaway")}${watchDest ? ` to ${watchDest}` : ""}`;
+
   const onSubmit = async (values: TripsFormValues) => {
+    // combine the title + destination for a friendly trip name
+    const base = values.title?.trim() || "Untitled Trip";
+    const title = values.destination ? `${base} to ${values.destination.trim()}` : base;
+
     console.log("Creating trip with values:", values);
-    // Compose a friendly title for the backend if you want
-    const title = values.title.trim() || (values.destination ? `Trip to ${values.destination}` : "Untitled Trip");
 
     // Convert Date → ISO string (or whatever your API expects)
     const startISO = values.startDate ? fmt(values.startDate, "yyyy-MM-dd") : "";
@@ -76,7 +81,7 @@ export default function NewTripForm({ redirectTo, ...formProps }: Props) {
         console.log("[NewTripForm] createTrip result:", res);
         
         // Navigate to the new trip’s page – adjust if your API returns something different 
-        const tripId = (res.data as { _id?: string; id?: string })._id ?? res.data.id;
+        const tripId = (res.data as { _id?: string; id?: string })._id ?? res.data._id;
         
         toast.success("Trip created!");
         router.push(`/trips/${encodeURIComponent(tripId)}`);
@@ -97,7 +102,14 @@ export default function NewTripForm({ redirectTo, ...formProps }: Props) {
       <h1 className="mb-6 text-center text-3xl font-semibold">Plan a new trip</h1>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6" {...formProps}>
+        <form onSubmit={form.handleSubmit
+        (onSubmit,       
+            (errs) => {
+        // fires when Zod blocks submit
+        console.log("[NewTripForm] validation failed:", errs);
+        toast.error("Please fix the highlighted fields.");
+      }
+    )}  className="w-full space-y-6">
 
           {form.formState.errors.root && (
             <div className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-700">
@@ -111,14 +123,35 @@ export default function NewTripForm({ redirectTo, ...formProps }: Props) {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Where to?</FormLabel>
+                <FormLabel>Trip Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. Rome, Italy, Nairobi..." {...field} />
+                  <Input placeholder="e.g. Weekend Getaway to..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+
+        {/* Destination (autocomplete) */}
+<FormField
+  control={form.control}
+  name="destination"
+  render={({ field, fieldState }) => (
+    <FormItem>
+      <FormLabel>Where to?</FormLabel>
+      <FormControl>
+        <DestinationAutocomplete
+          value={field.value}
+          onChange={field.onChange}
+          placeholder="e.g. Rome, Italy, Nairobi..."
+          invalid={fieldState.invalid}
+        />
+      </FormControl>
+      <FormMessage />
+    </FormItem>
+  )}
+/>
+
 
           {/* Dates (shadcn calendar pickers) */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
