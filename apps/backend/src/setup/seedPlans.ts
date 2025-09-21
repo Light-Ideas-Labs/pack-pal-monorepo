@@ -1,5 +1,5 @@
 // seeds/seedPlans.ts
-import Plan from '../models/Plan';
+import Plan from '../modules/models/plan/model';
 import { FeatureMatrix } from '../models/FeatureMatrix';
 
 export async function seedPlans() {

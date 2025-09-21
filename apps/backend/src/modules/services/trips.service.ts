@@ -6,6 +6,24 @@ import TripModel from '../models/trips/model';
 import TripDayModel from '../models/trip-day/model';
 import { paginateMongoose } from "../../utils/pagination";
 
+
+/** midnight UTC for a given date-like */
+const atUTC00 = (d: Date | string) => {
+  const x = new Date(d);
+  return new Date(Date.UTC(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()));
+};
+
+const eachUTCDateInclusive = (start: Date | string, end: Date | string) => {
+  const out: Date[] = [];
+  let cur = atUTC00(start).getTime();
+  const last = atUTC00(end).getTime();
+  while (cur <= last) {
+    out.push(new Date(cur));
+    cur += 86400000; // +1 day
+  }
+  return out;
+};
+
 const ensureObjectId = (v: string | Types.ObjectId, field = "id"): Types.ObjectId => {
   if (typeof v === "string") {
     if (!isValidObjectId(v)) {
@@ -52,6 +70,11 @@ const createTrip = (opts: { ownerId: string | Types.ObjectId; title: string; cov
         ],
         { session: s }
       );
+
+
+      // auto-create trip days for the date range
+      await ensureTripDays(trip[0]._id, opts.startDate, opts.endDate, s);
+
       return trip[0].toObject();
     });
     } catch (error) {
@@ -87,6 +110,7 @@ const listTripsByOwner = async (ownerId: string | Types.ObjectId, pg: Pagination
       }
 }
 
+
 const updateTrip = async (id: string | Types.ObjectId, patch: Partial<{title: string; coverColor: string; startDate: Date | string; endDate: Date | string;}> ) => {
     try {
         const updates: any = { ...patch };
@@ -95,6 +119,15 @@ const updateTrip = async (id: string | Types.ObjectId, patch: Partial<{title: st
         
         const trip = await TripModel.findByIdAndUpdate(id, updates, { new: true }).lean();
         if (!trip) throw new ApiError(StatusCodes.NOT_FOUND, 'Trip not found');
+          // if dates changed, ensure trip days
+        if (updates.startDate || updates.endDate) {
+          await ensureTripDays(
+            ensureObjectId(id, 'tripId'),
+            updates.startDate ?? trip.startDate,
+            updates.endDate ?? trip.endDate
+          );
+        }
+
         return trip;
     } catch (error) {
         if (error instanceof ApiError) throw error;
@@ -265,19 +298,76 @@ const compactTripDayOrders = async (tripId: string | Types.ObjectId) => {
   }
 
 
+  /**
+ * Create missing TripDay docs and remove extras so that the set of TripDays
+ * exactly matches [startDate..endDate]. Keeps activities on kept days.
+ */
+export const ensureTripDays = async (tripId: Types.ObjectId, startDate: Date | string, endDate: Date | string, session?: mongoose.ClientSession ) => {
+  const wanted = eachUTCDateInclusive(startDate, endDate);
+  const wantedKeys = new Set(wanted.map(d => d.toISOString()));
 
-  export {
-    createTrip,
-    getTrip,
-    listTripsByOwner,
-    updateTrip,
-    addDocument,
-    removeDocument,
-    addPackingItem,
-    togglePackingChecked,
-    setCollaborator,
-    addDay,
-    reorderDays,
-    removeDay,
-    compactTripDayOrders
+  const existing = await TripDayModel.find({ tripId }).sort({ order: 1 }).session(session ?? null);
+  const existingByKey = new Map(existing.map(d => [atUTC00(d.date).toISOString(), d]));
+
+  // create missing (use wanted order)
+  const toCreate: any[] = [];
+  wanted.forEach((d, idx) => {
+    const key = d.toISOString();
+    if (!existingByKey.has(key)) {
+      toCreate.push({ tripId, date: d, order: idx + 1, label: "" });
+    }
+  });
+
+  if (toCreate.length) {
+    await TripDayModel.insertMany(toCreate, { session });
   }
+
+  // remove extras (days outside the new range)
+  const extras = existing.filter(d => !wantedKeys.has(atUTC00(d.date).toISOString()));
+  if (extras.length) {
+    await TripDayModel.deleteMany(
+      { _id: { $in: extras.map(d => d._id) } },
+      { session }
+    );
+  }
+
+  // normalize order 1..n in wanted sequence
+  const updates = await TripDayModel.find({ tripId }).session(session ?? null);
+  updates.sort((a, b) => atUTC00(a.date).getTime() - atUTC00(b.date).getTime());
+  await Promise.all(
+    updates.map((d, i) =>
+      d.order !== i + 1
+        ? TripDayModel.updateOne({ _id: d._id }, { $set: { order: i + 1 } }).session(session ?? null)
+        : Promise.resolve()
+    )
+  );
+
+  return TripDayModel.find({ tripId }).sort({ order: 1 }).lean();
+};
+
+const listDaysForTrip = async (tripId: string | Types.ObjectId) => {
+  try {
+    const days = await TripDayModel.find({ tripId: ensureObjectId(tripId, "tripId") }).sort({ order: 1 }).lean();
+    return days;
+  } catch (error) {
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, 'Error fetching trip days');
+  }
+};
+
+
+export {
+  createTrip,
+  getTrip,
+  listTripsByOwner,
+  updateTrip,
+  addDocument,
+  removeDocument,
+  addPackingItem,
+  togglePackingChecked,
+  setCollaborator,
+  addDay,
+  reorderDays,
+  removeDay,
+  compactTripDayOrders,
+  listDaysForTrip
+}

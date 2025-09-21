@@ -21,6 +21,14 @@ export type Trip = {
   days?: number
  };
 
+ export type TripDay = {
+  _id: string;
+  tripId: string;
+  date: string; // ISO 00:00:00Z
+  order: number;
+  label?: string;
+  activities?: { _id: string; time?: string; title: string; description?: string; location?: string; }[];
+};
 
 export interface ItineraryItem {
   id: string;

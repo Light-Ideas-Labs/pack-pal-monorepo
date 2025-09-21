@@ -39,10 +39,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <StoreProvider>
         <ThemeProvider defaultTheme="system" storageKey="packpal-theme">
           {children}
-          {/* <PWAInstaller
+          <PWAInstaller
             title="Install PackPal"
             subtitle="Install this app on your device for a better experience."
-          /> */}
+          />
           <Toaster richColors closeButton position="top-right" />
         </ThemeProvider>
         </StoreProvider>

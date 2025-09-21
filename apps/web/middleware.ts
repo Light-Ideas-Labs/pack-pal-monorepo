@@ -7,9 +7,11 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const needsAuth = PROTECTED.some((r) => r.test(pathname));
   if (!needsAuth) return NextResponse.next();
-
-  const token = req.cookies.get("access_token")?.value;
-  if (!token) {
+  
+  
+  const access = req.cookies.get("access_token")?.value;
+  const refresh = req.cookies.get("refresh_token")?.value; // httpOnly is fine here
+  if (!access && !refresh) {
     const url = req.nextUrl.clone();
     url.pathname = "/auth/sign-in";
     url.searchParams.set("next", pathname);

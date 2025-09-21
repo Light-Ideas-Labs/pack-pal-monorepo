@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 import {
     createTripHandler, getTripHandler, listTripsHandler, updateTripHandler, addDocumentHandler, 
     removeDayHandler, removeDocumentHandler, addPackingItemHandler,togglePackingCheckedHandler, 
-    setCollaboratorHandler, addDayHandler, reorderDaysHandler 
+    setCollaboratorHandler, addDayHandler, reorderDaysHandler, listDaysForTripHandler
 } from '../../modules/controllers/trips.controller';
 
 import { requireAuth, authorizeRoles, requireUserOrGuest } from '../../middlewares/auth.middleware';
@@ -21,5 +21,6 @@ router.patch('/:id/packing-items/:itemId/toggle', requireAuth, togglePackingChec
 router.post('/:id/collaborators', requireAuth, setCollaboratorHandler);
 router.post('/:id/days', requireAuth, addDayHandler);
 router.patch('/:id/days/reorder', requireAuth, reorderDaysHandler);
+router.get('/:id/days', requireAuth, listDaysForTripHandler);
 
 export default router;
