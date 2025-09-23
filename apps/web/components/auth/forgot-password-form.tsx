@@ -14,7 +14,6 @@ import { useForgotPasswordMutation } from "@/lib/api/authApi";
 import { AuthHeader } from "@/components/auth/auth-header";
 import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validation/auth";
 
-
 export default function UserForgotPasswordForm() {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);

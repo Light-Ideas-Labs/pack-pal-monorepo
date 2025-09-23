@@ -69,3 +69,10 @@
     at ServerResponse.json (C:\Users\Admin\Desktop\Founder_Institute_StartUp\proof-of-ship\pack-pal-monorepo\node_modules\.pnpm\express@5.1.0\node_modules\express\lib\response.js:250:15)
     at C:\Users\Admin\Desktop\Founder_Institute_StartUp\proof-of-ship\pack-pal-monorepo\apps\backend\src\modules\controllers\auth.controller.ts:122:25
     at processTicksAndRejections (node:internal/process/task_queues:105:5)
+[2025-09-23T17:26:57.113Z] ERROR: Error: Cannot set headers after they are sent to the client
+    at ServerResponse.setHeader (node:_http_outgoing:699:11)
+    at ServerResponse.header (C:\Users\Admin\Desktop\Founder_Institute_StartUp\proof-of-ship\pack-pal-monorepo\node_modules\.pnpm\express@5.1.0\node_modules\express\lib\response.js:684:10)
+    at ServerResponse.send (C:\Users\Admin\Desktop\Founder_Institute_StartUp\proof-of-ship\pack-pal-monorepo\node_modules\.pnpm\express@5.1.0\node_modules\express\lib\response.js:161:12)
+    at ServerResponse.json (C:\Users\Admin\Desktop\Founder_Institute_StartUp\proof-of-ship\pack-pal-monorepo\node_modules\.pnpm\express@5.1.0\node_modules\express\lib\response.js:250:15)
+    at C:\Users\Admin\Desktop\Founder_Institute_StartUp\proof-of-ship\pack-pal-monorepo\apps\backend\src\modules\controllers\auth.controller.ts:122:25
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)

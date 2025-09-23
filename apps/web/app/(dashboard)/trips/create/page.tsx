@@ -1,9 +1,12 @@
+import RequireAuth from "@/components/auth/require-auth";
 import NewTripForm from "@/components/trips/new-trip-form";
 
 export default function NewTripPage() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <NewTripForm />
+      <RequireAuth>
+        <NewTripForm />
+      </RequireAuth>
     </div>
   );
 }

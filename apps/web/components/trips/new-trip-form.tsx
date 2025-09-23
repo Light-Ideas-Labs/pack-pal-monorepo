@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { format as fmt } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Input } from "@/components/ui/input";

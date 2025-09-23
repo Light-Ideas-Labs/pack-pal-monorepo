@@ -1,10 +1,11 @@
 "use client";
 
-import { use, useState, useMemo } from "react"; 
+import { use, useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation"; 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import * as Icons from "lucide-react";
-import { Sidebar, TripHeader, Explore, Reservations, Budget, Notes, MapPanel, } from "@/components/trips";
+import { Sidebar, TripHeader, Explore, Reservations, Budget, Notes, MapPanel, Itinerary, } from "@/components/trips";
 import InviteDialog from "@/components/trips/invite-dialog";
 import { useGetTripQuery, useListTripDaysQuery } from "@/lib/api/tripsApi";  // <- RTKQ hook
 import { useSelector } from "react-redux";
@@ -14,6 +15,7 @@ type PageProps = { params: Promise<{ id: string }> };
 type DayItem = { id: string; label: string; date?: string; active?: boolean };
 
 export default function TripPlannerPage({ params }: PageProps) {
+  const router = useRouter();
 
   const { id } =  use(params); // <-- await the promise
   const tripId = decodeURIComponent(id);
@@ -26,15 +28,32 @@ export default function TripPlannerPage({ params }: PageProps) {
     image: user?.avatarUrl,
   }
 
-
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
+
+  const scrollTo = (anchor: string) => {
+    const id = anchor.startsWith("#") ? anchor.slice(1) : anchor;
+    const el = typeof document !== "undefined" ? document.getElementById(id) : null;
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.replaceState(null, "", `#${id}`);
+    } else {
+      router.push(`#${id}`); // fallback to routing (will jump, not smooth)
+    }
+  };
 
   // fetch trip + days with RTKQ hooks
   const { data, isLoading, isError, refetch } = useGetTripQuery(tripId, { refetchOnFocus: true, refetchOnReconnect: true, });
   const { data: daysRes } = useListTripDaysQuery(tripId);
 
   const trip = data?.data;
+
+  useEffect(() => {
+  if (typeof window !== "undefined" && window.location.hash) {
+    scrollTo(window.location.hash);
+  }
+  // re-run when trip changes so initial scroll still works after data loads
+}, [tripId]);
 
   // ✅ always called (before any early returns)
   const inviteLink = useMemo(() => {
@@ -147,8 +166,11 @@ export default function TripPlannerPage({ params }: PageProps) {
       { key: "untitled", label: "Untitled", icon: <Icons.FileIcon className="h-4 w-4" /> },
     ]}
     onSelect={(section, key) => {
-      // route or focus logic here
-      // e.g. router.push(`#${section}-${key}`)
+    const anchor =
+      section === "overview"   ? `overview-${key}` :
+      section === "itinerary"  ? `day-${key}` :
+      section === "budget"     ? `overview-budget` : `${section}-${key}`; // fallback
+      scrollTo(anchor);
     }}
   />
 
@@ -164,14 +186,36 @@ export default function TripPlannerPage({ params }: PageProps) {
             onInviteClick={() => setInviteOpen(true)} // TODO: implement invite functionality MODAL
           />
 
+
+
           {/* Anchor sections (scroll-mt offsets for sticky header) */}
+          <section id="overview-explore" className="scroll-mt-24 md:scroll-mt-32" >
           <Explore />
+          </section>
 
-          <Reservations />
+          <section id="overview-reservations" className="scroll-mt-24 md:scroll-mt-32" >
+            <Reservations />
+          </section>
 
-          <Budget amount={0} currency="KES" />
+          <section id="overview-itinerary" className="scroll-mt-24 md:scroll-mt-32" >
+          <Itinerary
+            days={uiDays}
+            dateRangeLabel={
+              trip?.startDate && trip?.endDate
+                ? new Intl.DateTimeFormat(undefined, { month: "numeric", day: "numeric" })
+                    .formatRange(new Date(trip.startDate), new Date(trip.endDate))
+                : undefined
+            }
+          />
+          </section>
 
-          <Notes />
+          <section id="overview-budget" className="scroll-mt-24 md:scroll-mt-32" >
+            <Budget amount={0} currency="KES" />
+          </section>
+
+          <section id="overview-notes" className="scroll-mt-24 md:scroll-mt-32" >
+            <Notes />
+          </section>
         </main>
 
         {/* Right map column */}

@@ -1,6 +1,6 @@
 // seeds/seedPlans.ts
 import Plan from '../modules/models/plan/model';
-import { FeatureMatrix } from '../models/FeatureMatrix';
+import { FeatureMatrix } from '../modules/models/feature-matrix/model';
 
 export async function seedPlans() {
   const matrix = await FeatureMatrix.findOne() || await FeatureMatrix.create({

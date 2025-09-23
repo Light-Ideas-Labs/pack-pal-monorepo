@@ -290,9 +290,4 @@ function NavItem({
   );
 }
 
-/** Try to compress "Fri 9/26" → "9/26" or leave as-is if unknown. */
-function compactDateLabel(label: string) {
-  // matches "Fri 9/26" or "9/26 – 9/28"
-  const m = label.match(/\b(\d{1,2}\/\d{1,2})(?:\b|$)/);
-  return m?.[1] ?? label;
-}
+

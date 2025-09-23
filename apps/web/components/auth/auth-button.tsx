@@ -17,7 +17,7 @@ export function AuthButton() {
   const handleSignOut = async () => {
     try{
       await signOut().unwrap();
-      router.push("/trips");
+      router.push("auth/sign-in");
     }catch (error){
       toast.error("Sign out failed. Please try again.");
     }
