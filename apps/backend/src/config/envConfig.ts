@@ -6,10 +6,10 @@ const envFile = process.env.NODE_ENV === "production" ? ".env.production" : ".en
 config({ path: envFile });
 
 const envSchema = z.object({
+  PORT: z.coerce.number().default(4000),
   NODE_ENV: z.enum(["development", "production", "test"]).default("production"),
 
   APP_NAME: z.string().default("CoinlistAfricaAPI"),
-  APP_PORT: z.coerce.number().default(4000),
   APP_FRONTEND_URL: z.string().url({ message: "APP_FRONTEND_URL must be a valid URL" }).default("http://localhost:3000"),
 
   PRO_MONGO_URI: z.string().regex(/^mongodb(\+srv)?:\/\//, { message: "Invalid MongoDB URI format. Must start with mongodb:// or mongodb+srv://", }),

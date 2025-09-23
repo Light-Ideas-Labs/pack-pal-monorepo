@@ -1,12 +1,11 @@
 import http from "http";
-import * as dotenv from "dotenv";
-dotenv.config();
+import { env } from './config/envConfig'
 
 import app from "./app";
 import connectDB from "./config/mongodb.config";
 
-const isProduction = process.env.NODE_ENV === "production";
-const PORT = process.env.APP_PORT || 4000;
+const isProduction = env.NODE_ENV === "production";
+const PORT = env.PORT || 4000;
 
 // Connect to the database
 connectDB().catch((err) => {
