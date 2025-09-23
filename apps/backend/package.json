@@ -1,15 +1,17 @@
 {
   "name": "pack-pal-backend",
-  "version": "1.0.0",
+  "version": "0.0.1",
+  "description": "Backend for Pack Pal application",
   "private": true,
   "type": "commonjs",
   "main": "dist/index.js",
+  "author": "Jordan-type",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "prestart": "pnpm run build",
-    "build": "rimraf dist && tsc",
+    "build": "rimraf dist && tsup src/index.ts --format cjs --dts --sourcemap --target node18 --out-dir dist",
     "start": "node dist/index.js",
-    "dev": "ts-node-dev --transpile-only ./src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only ./src/index.ts",
     "seed": "ts-node --transpile-only src/setup/run-seed.ts",
     "clear": "rm -rf node_modules package-lock.json"
   },
