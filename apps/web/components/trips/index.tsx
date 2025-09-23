@@ -5,3 +5,4 @@ export { default as Reservations } from "./reservations";
 export { default as Budget } from "./budget";
 export { default as Notes } from "./notes";
 export { default as MapPanel } from "./map-panel";
+export { default as Itinerary } from "./itinerary";

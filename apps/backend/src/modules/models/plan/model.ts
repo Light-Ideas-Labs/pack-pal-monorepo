@@ -1,14 +1,7 @@
 // models/Plan.ts
 import mongoose, { Schema } from 'mongoose';
 
-const FeatureMatrixSchema = new Schema({
-  label: { type: String, required: true },
-  tiers: {
-    free:  { type: String, default: '' },
-    pro:   { type: String, default: '' },
-    teams: { type: String, default: '' },
-  }
-}, { _id: false });
+
 
 const PriceOptionSchema = new Schema({
   interval: { type: String, enum: ['monthly', 'yearly'], required: true },
@@ -45,9 +38,4 @@ const PlanSchema = new Schema({
 
 export default mongoose.model('Plans', PlanSchema);
 
-// models/FeatureMatrix.ts (optional, to mirror your FEATURES table)
-const FeatureMatrixModel = new Schema({
-  items: [FeatureMatrixSchema]
-}, { timestamps: true });
 
-export const FeatureMatrix = mongoose.model('FeatureMatrix', FeatureMatrixModel);

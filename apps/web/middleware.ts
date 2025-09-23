@@ -1,28 +1,30 @@
+// middleware.ts
 import { NextResponse, type NextRequest } from "next/server";
-// If you can decode the token to read role, import a tiny decoder here.
 
 const PROTECTED = [/^\/trips(\/|$)/, /^\/dashboard(\/|$)/, /^\/admin(\/|$)/];
 
 export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-  const needsAuth = PROTECTED.some((r) => r.test(pathname));
+  const { pathname, search } = req.nextUrl;
+  const needsAuth = PROTECTED.some((re) => re.test(pathname));
   if (!needsAuth) return NextResponse.next();
 
-  const token = req.cookies.get("access_token")?.value;
-  if (!token) {
+  // If either access or refresh is present, let the page load.
+  // Your client can refresh the token if only refresh exists.
+  const access = req.cookies.get("access_token")?.value;
+  const refresh = req.cookies.get("refresh_token")?.value;
+
+  if (!access && !refresh) {
     const url = req.nextUrl.clone();
     url.pathname = "/auth/sign-in";
-    url.searchParams.set("next", pathname);
+    url.searchParams.set("next", pathname + (search || ""));
     return NextResponse.redirect(url);
   }
 
-  // OPTIONAL: if you can read role (either via a "role" cookie or decoding token)
-  const roleCookie = req.cookies.get("role")?.value; // set this on login if possible
-  const role = roleCookie?.toLowerCase();
-
+  // Optional: role-gate admin
+  const role = req.cookies.get("role")?.value?.toLowerCase();
   if (pathname.startsWith("/admin") && role !== "admin") {
     const url = req.nextUrl.clone();
-    url.pathname = "/trips/list"; // redirect non-admins to customer home
+    url.pathname = "/trips/list";
     return NextResponse.redirect(url);
   }
 
@@ -30,5 +32,6 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
+  // Only run on the sections we care about
   matcher: ["/trips/:path*", "/dashboard/:path*", "/admin/:path*"],
 };

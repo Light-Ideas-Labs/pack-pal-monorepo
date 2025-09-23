@@ -1,5 +1,5 @@
 import { api } from "../store/api";
-import { Trip } from "../../types";
+import { Trip, TripDay } from "../../types";
 
 type Paginated<T> = {
   data: T[];
@@ -92,6 +92,16 @@ export const tripsApi = api.injectEndpoints({
       query: ({ id }) => ({ url: `/trips/${id}/remove/day`, method: "POST" }),
       invalidatesTags: (_r, _e, { id }) => ["TripDays", { type: "Trips", id }],
     }),
+
+    listTripDays: build.query<{ success: boolean; data: TripDay[] }, string>({
+      query: (tripId) => ({ url: `/trips/${encodeURIComponent(tripId)}/days` }),
+      providesTags: (res, _e, id) =>
+        res?.data?.length
+          ? [{ type: "TripDays" as const, id }, ...res.data.map(d => ({ type: "TripDays" as const, id: d._id }))]
+          : [{ type: "TripDays" as const, id }],
+    }),
+
+
   }),
 });
 
@@ -108,4 +118,5 @@ export const {
   useAddDayMutation,
   useReorderDaysMutation,
   useRemoveDayMutation,
+  useListTripDaysQuery,
 } = tripsApi;

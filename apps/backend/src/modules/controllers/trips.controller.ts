@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import { RequestHandler, Request, Response } from 'express';
-import { createTrip, getTrip, listTripsByOwner, updateTrip, addDocument, removeDocument, addPackingItem, togglePackingChecked, setCollaborator, addDay, reorderDays, removeDay } from '../services/trips.service';
+import { createTrip, getTrip, listTripsByOwner, updateTrip, addDocument, removeDocument, addPackingItem, togglePackingChecked, setCollaborator, addDay, reorderDays, removeDay, listDaysForTrip } from '../services/trips.service';
 import { parsePageParams } from "../../utils/pagination";
 
 // add these helpers near the top of the controller
@@ -316,6 +316,30 @@ const removeDayHandler: RequestHandler = asyncHandler(async (req: Request, res: 
     }
 });
 
+const listDaysForTripHandler: RequestHandler = asyncHandler(async (req: Request, res: Response) => {
+    try {
+        const tripId = req.params.id;
+        const days = await listDaysForTrip(tripId);
+        if (!days) {
+            res.status(404).json({ 
+                success: false, 
+                message: 'Trip not found' 
+            });
+        return;
+    }
+
+    res.status(200).json({ success: true, data: days });
+}
+catch (error) {
+    res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: (error as Error).message
+
+    })
+}
+});
+
 export {
     createTripHandler,
     getTripHandler,
@@ -328,5 +352,6 @@ export {
     togglePackingCheckedHandler,
     setCollaboratorHandler,
     addDayHandler,
-    reorderDaysHandler
+    reorderDaysHandler,
+    listDaysForTripHandler
 };

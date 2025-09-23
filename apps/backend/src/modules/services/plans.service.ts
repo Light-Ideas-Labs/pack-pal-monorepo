@@ -1,6 +1,7 @@
 import { Types, isValidObjectId } from "mongoose";
 import { StatusCodes } from "http-status-codes";
-import PlanModel, { FeatureMatrix as FeatureMatrixModel } from "../models/plan/model";
+import PlanModel from "../models/plan/model";
+import { FeatureMatrix as FeatureMatrixModel }  from "../models/feature-matrix/model";
 import { ApiError } from "../../middlewares/errorHandler";
 
 export type PlanName = 'free' | 'pro' | 'teams';

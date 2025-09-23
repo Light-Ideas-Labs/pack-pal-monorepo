@@ -18,8 +18,6 @@ export default function Navbar() {
   const router = useRouter();
   const dispatch = useDispatch();
 
-
-
   const { token, user } = useSelector(selectAuth);
   const signedIn = Boolean(token);
   const name = user?.userName || (user?.email ? user.email.split("@")[0] : null);
@@ -64,7 +62,7 @@ export default function Navbar() {
                   New trip
                 </Button>
               </Link>
-              <Link href="/trips/list">
+              <Link href={`/auth/sign-in?next=${encodeURIComponent("/trips/list")}`}>
                 <Button variant="outline">
                   <MapPinned className="mr-2 h-4 w-4" />
                   My trips
@@ -118,7 +116,7 @@ export default function Navbar() {
               <Link href="/auth/sign-in">
                 <Button variant="ghost">Sign in</Button>
               </Link>
-              <Link href="/trips/create">
+              <Link href={`/auth/sign-in?next=${encodeURIComponent("/trips/create")}`}>
                 <Button className="bg-brand-500 hover:bg-brand-600">
                   Get started
                 </Button>

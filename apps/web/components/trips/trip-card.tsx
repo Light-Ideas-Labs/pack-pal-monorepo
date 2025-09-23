@@ -70,10 +70,13 @@ function computeBadge(startISO: string, endISO?: string) {
 export function TripCard({ trip }: { trip: CardTrip }) {
   const href = `/trips/${encodeURIComponent(trip.id)}`;
 
+  const count = trip.placesCount ?? 0;
+
   const start = new Date(trip.startDate);
   const end = new Date(trip.endDate);
   const dateRange = `${start.toLocaleDateString()} – ${end.toLocaleDateString()}`;
   const dateRangeBadge = computeBadge(trip.startDate, trip.endDate);
+
 
   const bgColor = trip.coverUrl ? undefined : isTripColor(trip.coverColor) ? COLOR_BG[trip.coverColor] : trip.coverColor || COLOR_BG.peach;
 
@@ -105,7 +108,8 @@ export function TripCard({ trip }: { trip: CardTrip }) {
 
     <span className="inline-flex items-center gap-1 rounded-full bg-background/90 px-2 py-1 text-xs shadow ring-1 ring-border">
       <Map className="h-3 w-3" />
-      {trip.placesCount === 0 ? "place" : "places"} saved
+      <span>{count}</span>
+      <span>{count === 1 ? "place" : "places"} saved</span>
     </span>
   </div>
 
