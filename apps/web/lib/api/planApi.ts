@@ -1,8 +1,8 @@
 import { api } from "../store/api";
 
 export type PlanName = "free" | "pro" | "teams";
-export type Plan = { _id: string; name: PlanName; [k: string]: any };
-export type FeatureMatrix = { _id: string; [k: string]: any };
+export type Plan = { _id: string; name: PlanName; [k: string]: unknown };
+export type FeatureMatrix = { _id: string; [k: string]: unknown };
 
 export const plansApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -34,11 +34,11 @@ export const plansApi = api.injectEndpoints({
     }),
 
     // Feature matrices
-    createFeatureMatrix: build.mutation<{ success: boolean; data: FeatureMatrix }, any>({
+    createFeatureMatrix: build.mutation<{ success: boolean; data: FeatureMatrix }, unknown>({
       query: (body) => ({ url: "/plans/feature-matrices", method: "POST", body }),
       invalidatesTags: ["Plans", "FeatureMatrix"],
     }),
-    upsertFeatureMatrix: build.mutation<{ success: boolean; data: FeatureMatrix }, any>({
+    upsertFeatureMatrix: build.mutation<{ success: boolean; data: FeatureMatrix }, unknown>({
       query: (body) => ({ url: "/plans/feature-matrices", method: "PUT", body }),
       invalidatesTags: ["Plans", "FeatureMatrix"],
     }),

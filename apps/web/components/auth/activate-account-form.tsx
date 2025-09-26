@@ -48,10 +48,9 @@ export function AccountActivationForm() {
       toast.success("Activation successful. You can now sign in.");
       sessionStorage.removeItem("activation_token");
       router.replace("/auth/sign-in");
-    } catch (e: any) {
-      toast.error(
-        e?.data?.message || e?.message || "Activation failed. Please try again."
-      );
+    } catch (error: unknown) {
+      const err = error as { data?: { message?: string }; message?: string };
+      toast.error(err?.data?.message || err?.message || "Activation failed. Please try again.");
     }
   }
 

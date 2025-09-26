@@ -20,7 +20,6 @@ type MapComponentProps = {
 
 export default function MapProvider({mapContainerRef, initialViewState, children}: MapComponentProps) {
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [map, setMap] = useState<mapboxgl.Map | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -36,7 +35,6 @@ export default function MapProvider({mapContainerRef, initialViewState, children
     });
 
     mapRef.current = m;
-    setMap(m); // Set live instance of the map state when the map is initialized - this will trigger a re-render
 
     m.on("load", () => {
       setLoaded(true);

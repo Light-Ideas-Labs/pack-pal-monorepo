@@ -1,7 +1,9 @@
 export type TripColor = "peach" | "lavender" | "mint" | "sun" | "ocean" | "grape";
 
+export type ID = string;
+
 export type Trip = { 
-  _id: string; 
+  _id: ID; 
   title: string;
   startDate: string; 
   endDate: string; 
@@ -10,10 +12,10 @@ export type Trip = {
   coverColor: string | TripColor; 
   placesCount?: number; 
   itinerary?: ItineraryItem[];
-  documents?: any[]; 
-  packingItems?: any[]; 
-  collaborations?: any[]; 
-  useOfFunds?: any[]; 
+  documents?: unknown[]; 
+  packingItems?: unknown[]; 
+  collaborations?: unknown[]; 
+  useOfFunds?: unknown[]; 
   visibility: "private" | "public" | "friends"; 
   invites?: string[]; 
   createdAt: string; 
@@ -22,17 +24,17 @@ export type Trip = {
  };
 
  export type TripDay = {
-  _id: string;
-  tripId: string;
+  _id: ID;
+  tripId: ID;
   date: string; // ISO 00:00:00Z
   order: number;
   label?: string;
-  activities?: { _id: string; time?: string; title: string; description?: string; location?: string; }[];
+  activities?: { _id: ID; time?: string; title: string; description?: string; location?: string; }[];
 };
 
 export interface ItineraryItem {
-  id: string;
-  tripId: string;
+  id: ID;
+  tripId: ID;
   time: string; // "10:30"
   title: string;
   note?: string;

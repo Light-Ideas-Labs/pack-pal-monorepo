@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
+type NavigatorWithStandalone = Navigator & { standalone?: boolean };
+
 type InstallOutcome = 'accepted' | 'dismissed';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -47,12 +49,12 @@ const isIOS = () =>
   typeof window !== 'undefined' && /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 
 const isStandalone = () =>
-  // iOS Safari
-  (typeof window !== 'undefined' && (window.navigator as any).standalone === true) ||
+  // iOS Safari exposes non-standard `navigator.standalone`
+  (typeof window !== "undefined" && (window.navigator as NavigatorWithStandalone).standalone === true) ||
   // Other browsers
-  (typeof window !== 'undefined' &&
+  (typeof window !== "undefined" &&
     window.matchMedia &&
-    window.matchMedia('(display-mode: standalone)').matches);
+    window.matchMedia("(display-mode: standalone)").matches);
 
 function pathMatches(pathname: string, rules?: RouteRule[]) {
   if (!rules || rules.length === 0) return true;

@@ -1,6 +1,6 @@
 import { api } from "../store/api";
 
-export type Subscription = { _id: string; plan: string; status: string; [k: string]: any };
+export type Subscription = { _id: string; plan: string; status: string; [k: string]: unknown };
 
 export const subscriptionsApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -22,11 +22,11 @@ export const subscriptionsApi = api.injectEndpoints({
       query: (id) => ({ url: `/subscriptions/${id}/expire`, method: "PATCH" }),
       invalidatesTags: ["Subscriptions"],
     }),
-    getEntitlement: build.query<any, string>({
+    getEntitlement: build.query<unknown, string>({
       query: (userId) => ({ url: `/subscriptions/${userId}/entitlement` }),
       providesTags: ["Subscriptions"],
     }),
-    verifySubscription: build.mutation<any, {
+    verifySubscription: build.mutation<unknown, {
       provider: string;
       productId: string;
       purchaseToken: string;

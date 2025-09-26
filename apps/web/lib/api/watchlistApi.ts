@@ -1,6 +1,19 @@
 import { api } from "../store/api";
 
-export type WatchItem = { _id: string; title?: string; labels?: string[]; isMuted?: boolean; [k: string]: any };
+export type WatchItem = {
+  _id: string;
+  title?: string;
+  labels?: string[];
+  isMuted?: boolean;
+  [k: string]: unknown;
+};
+
+type Meta = {
+  page?: number;
+  limit?: number;
+  total?: number;
+  [k: string]: unknown;
+};
 
 export const watchlistApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -8,27 +21,28 @@ export const watchlistApi = api.injectEndpoints({
       query: (body) => ({ url: "/watchlist", method: "POST", body }),
       invalidatesTags: ["Watchlist"],
     }),
-    removeFromWatchlistByTarget: build.mutation<{ success: boolean; dataItem: any }, { targetId: string }>({
+
+    removeFromWatchlistByTarget: build.mutation<{ success: boolean; dataItem: WatchItem }, { targetId: string }>({
       query: (body) => ({ url: "/watchlist/target", method: "DELETE", body }),
       invalidatesTags: ["Watchlist"],
     }),
-    removeFromWatchlistById: build.mutation<{ success: boolean; dataItem: any }, string>({
+
+    removeFromWatchlistById: build.mutation<{ success: boolean; dataItem: WatchItem }, string>({
       query: (watchlistId) => ({ url: `/watchlist/${watchlistId}`, method: "DELETE" }),
       invalidatesTags: ["Watchlist"],
     }),
 
-    getWatchlist: build.query<{
-      success: boolean;
-      dataList: WatchItem[];
-      meta?: any;
-    }, {
-      targetKind?: "Project" | "Trips" | "Places" | "Flights" | "Countries";
-      isMuted?: boolean;
-      page?: number;
-      limit?: number;
-      sortBy?: string; // e.g. "createdAt:desc"
-      populate?: boolean;
-    } | void>({
+    getWatchlist: build.query<
+      { success: boolean; dataList: WatchItem[]; meta?: Meta },
+      {
+        targetKind?: "Project" | "Trips" | "Places" | "Flights" | "Countries";
+        isMuted?: boolean;
+        page?: number;
+        limit?: number;
+        sortBy?: string;
+        populate?: boolean;
+      } | void
+    >({
       query: (q) => {
         const params = new URLSearchParams();
         if (!q) q = {};
@@ -43,6 +57,7 @@ export const watchlistApi = api.injectEndpoints({
       },
       providesTags: ["Watchlist"],
     }),
+
     getWatchlistItem: build.query<{ success: boolean; dataItem: WatchItem }, { watchlistId: string; populate?: boolean }>({
       query: ({ watchlistId, populate }) => ({
         url: `/watchlist/${watchlistId}${populate ? `?populate=${populate}` : ""}`,
@@ -50,55 +65,55 @@ export const watchlistApi = api.injectEndpoints({
       }),
       providesTags: (_r, _e, { watchlistId }) => [{ type: "Watchlist", id: watchlistId }],
     }),
-    updateWatchlistItem: build.mutation<{ success: boolean; dataItem: WatchItem }, {
-      watchlistId: string;
-      title?: string;
-      labels?: string[];
-      isMuted?: boolean;
-      notifyOn?: any;
-      meta?: any;
-    }>({
+
+    updateWatchlistItem: build.mutation<
+      { success: boolean; dataItem: WatchItem },
+      {
+        watchlistId: string;
+        title?: string;
+        labels?: string[];
+        isMuted?: boolean;
+        notifyOn?: unknown;
+        meta?: Record<string, unknown>;
+      }
+    >({
       query: ({ watchlistId, ...body }) => ({ url: `/watchlist/${watchlistId}`, method: "PATCH", body }),
       invalidatesTags: ["Watchlist"],
     }),
+
     muteWatchlistItem: build.mutation<{ success: boolean; dataItem: WatchItem }, { watchlistId: string; isMuted: boolean }>({
-      query: ({ watchlistId, isMuted }) => ({ url: `/watchlist/${watchlistId}/mute`, method: "PATCH", body: { isMuted } }),
+      query: ({ watchlistId, isMuted }) => ({
+        url: `/watchlist/${watchlistId}/mute`,
+        method: "PATCH",
+        body: { isMuted },
+      }),
       invalidatesTags: ["Watchlist"],
     }),
-    updateNotifyRules: build.mutation<{ success: boolean; dataItem: WatchItem }, { watchlistId: string; rules: any }>({
+
+    updateNotifyRules: build.mutation<{ success: boolean; dataItem: WatchItem }, { watchlistId: string; rules: Record<string, unknown> }>({
       query: ({ watchlistId, rules }) => ({ url: `/watchlist/${watchlistId}/notify`, method: "PATCH", body: { rules } }),
       invalidatesTags: ["Watchlist"],
     }),
+
     addLabels: build.mutation<{ success: boolean; dataItem: WatchItem }, { watchlistId: string; labels: string[] }>({
       query: ({ watchlistId, labels }) => ({ url: `/watchlist/${watchlistId}/labels`, method: "POST", body: { labels } }),
       invalidatesTags: ["Watchlist"],
     }),
+
     removeLabel: build.mutation<{ success: boolean; dataItem: WatchItem }, { watchlistId: string; label: string }>({
-      query: ({ watchlistId, label }) => ({ url: `/watchlist/${watchlistId}/labels/${encodeURIComponent(label)}`, method: "DELETE" }),
+      query: ({ watchlistId, label }) => ({
+        url: `/watchlist/${watchlistId}/labels/${encodeURIComponent(label)}`,
+        method: "DELETE",
+      }),
       invalidatesTags: ["Watchlist"],
     }),
 
-    // helpers (jobs)
-    getCountryWatchers: build.query<{ success: boolean; dataList: any[] }, string>({
+    getCountryWatchers: build.query<{ success: boolean; dataList: Record<string, unknown>[] }, string>({
       query: (countryCode) => ({ url: `/watchers/countries/${countryCode}`, method: "GET" }),
     }),
-    getTripReminderWatchers: build.query<{ success: boolean; dataList: any[] }, string>({
+
+    getTripReminderWatchers: build.query<{ success: boolean; dataList: Record<string, unknown>[] }, string>({
       query: (tripId) => ({ url: `/watchers/trips/${tripId}`, method: "GET" }),
     }),
   }),
 });
-
-export const {
-  useAddToWatchlistMutation,
-  useRemoveFromWatchlistByTargetMutation,
-  useRemoveFromWatchlistByIdMutation,
-  useGetWatchlistQuery,
-  useGetWatchlistItemQuery,
-  useUpdateWatchlistItemMutation,
-  useMuteWatchlistItemMutation,
-  useUpdateNotifyRulesMutation,
-  useAddLabelsMutation,
-  useRemoveLabelMutation,
-  useGetCountryWatchersQuery,
-  useGetTripReminderWatchersQuery,
-} = watchlistApi;

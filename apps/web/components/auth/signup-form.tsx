@@ -59,13 +59,13 @@ export function SignUpForm({ redirectTo, ...formProps }: Props) {
         toast.info("Account created. Check your email for an activation link/code.");
         router.push("/auth/sign-in");
       }
-    } catch (e: any) {
-      const msg = e?.data?.message || e?.error || e?.message || "Sign up failed";
+    } catch (err: unknown) {
+      const msg = (err as { data?: { message?: string }; message?: string })?.data?.message || (err as { message?: string })?.message || "Login failed";
       toast.error(msg);
     }
   };
 
-  const apiErr = (error as any)?.data?.message || (error as any)?.error;
+  const apiErr = (error as { data?: { message?: string }; error?: string } | undefined)?.data?.message || (error as { error?: string } | undefined)?.error;
 
   return (
     <>

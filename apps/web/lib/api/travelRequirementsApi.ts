@@ -12,7 +12,7 @@ export type TravelReqParams = {
 
 export const travelRequirementsApi = api.injectEndpoints({
   endpoints: (build) => ({
-    getTravelRequirements: build.query<{ success: boolean; cached?: boolean; data: any }, TravelReqParams>({
+    getTravelRequirements: build.query<{ success: boolean; cached?: boolean; data: unknown }, TravelReqParams>({
       query: ({ to, citizenship, residence, transit, ttlDays, forceRefresh }) => {
         const params = new URLSearchParams();
         params.set("to", to);

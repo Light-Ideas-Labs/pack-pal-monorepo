@@ -18,8 +18,9 @@ export function AuthButton() {
     try{
       await signOut().unwrap();
       router.push("auth/sign-in");
-    }catch (error){
-      toast.error("Sign out failed. Please try again.");
+    }catch (error: unknown) {
+      const err = error as { data?: { message?: string }; message?: string };
+      toast.error(err?.data?.message || err?.message || "Sign out failed. Please try again.");
     }
   };
 

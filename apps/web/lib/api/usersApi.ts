@@ -6,7 +6,7 @@ export type User = {
   lastName: string;
   email: string;
   role: string;
-  [k: string]: any;
+  [k: string]: unknown;
 };
 
 export const usersApi = api.injectEndpoints({

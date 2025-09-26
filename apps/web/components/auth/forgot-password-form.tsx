@@ -17,7 +17,7 @@ import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validation
 export default function UserForgotPasswordForm() {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-  const [forgot, { isLoading, isSuccess, error }] = useForgotPasswordMutation();
+  const [forgot, ] = useForgotPasswordMutation();
 
   const form = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -43,10 +43,11 @@ export default function UserForgotPasswordForm() {
         // else router.push('/auth/check-your-email');
         toast.error("No token received. Please check your email for further instructions.");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error sending reset link:", error)
       // toast error message
-      toast.error("Failed to send password reset link.");
+      const err = error as { data?: { message?: string }; message?: string };
+      toast.error(err?.data?.message || err?.message || "Failed to send password reset link.");
     } finally {
       setLoading(false);
     }

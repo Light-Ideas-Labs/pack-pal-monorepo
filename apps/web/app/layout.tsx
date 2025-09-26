@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/context/theme-context";
-import { PWAInstaller } from "@/components/pwa-Installer";
+import { PWAInstaller } from "@/components/pwa-installer";
 import  StoreProvider  from "@/lib/store/StoreProvider";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import "./globals.css";
