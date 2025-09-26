@@ -32,7 +32,7 @@ export default function NewTripForm() {
   const router = useRouter();
   const [createTrip, { isLoading, error }] = useCreateTripMutation();
 
-  const form = useForm<TripsFormInput, any, TripsFormValues>({
+  const form = useForm<TripsFormInput, unknown, TripsFormValues>({
     resolver: zodResolver(NewTripSchema),
     defaultValues:{
       title: "",
@@ -46,9 +46,9 @@ export default function NewTripForm() {
   });
 
   // live preview (optional)
-  const watchTitle = form.watch("title");
-  const watchDest = form.watch("destination");
-  const preview =  `${(watchTitle?.trim() || "Untitled getaway")}${watchDest ? ` to ${watchDest}` : ""}`;
+  // const watchTitle = form.watch("title");
+  // const watchDest = form.watch("destination");
+  // const preview =  `${(watchTitle?.trim() || "Untitled getaway")}${watchDest ? ` to ${watchDest}` : ""}`;
 
   const onSubmit = async (values: TripsFormValues) => {
     // combine the title + destination for a friendly trip name
@@ -81,21 +81,21 @@ export default function NewTripForm() {
         console.log("[NewTripForm] createTrip result:", res);
         
         // Navigate to the new trip’s page – adjust if your API returns something different 
-        const tripId = (res.data as { _id?: string; id?: string })._id ?? res.data._id;
+        const tripId = (res?.data as { _id?: string; id?: string })?._id ?? (res?.data as { _id?: string; id?: string })?.id;
+        if (!tripId) throw new Error("No trip id returned");
         
         toast.success("Trip created!");
         router.push(`/trips/${encodeURIComponent(tripId)}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log("Failed to create trip:", err);
-      
 
-      const msg = err?.data?.message || err?.error || "Something went wrong creating your trip.";
+      const msg = (err as { data?: { message?: string }; message?: string })?.data?.message || (err as { message?: string })?.message || "Something went wrong creating your trip.";
       // optionally toast.error(msg) if you use react-hot-toast
       toast.error(msg);
     }
   };
-
-  const apiErr = (error as any)?.data?.message || (error as any)?.error;
+  
+  const apiErr = (error as { data?: { message?: string }; error?: string } | undefined)?.data?.message || (error as { error?: string } | undefined)?.error;
 
   return (
     <div className="mx-auto max-w-xl py-10">

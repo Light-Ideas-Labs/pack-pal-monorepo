@@ -12,3 +12,10 @@ export type ApiEnvelope<T = unknown> = {
   [k: string]: any;
 };
 
+// Common API error shape (tweak to match your backend)
+export type ApiError = {
+  status: number;
+  data?: unknown;
+  message?: string;
+};
+

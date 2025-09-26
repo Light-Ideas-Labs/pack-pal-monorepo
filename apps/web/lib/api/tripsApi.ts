@@ -1,10 +1,13 @@
 import { api } from "../store/api";
 import { Trip, TripDay } from "../../types";
 
+type Links = Record<string, string>;
+type Meta = { page?: number; limit?: number; total?: number; [k: string]: unknown };
+
 type Paginated<T> = {
   data: T[];
-  _links: any;
-  _meta: any
+  _links: Links;
+  _meta: Meta;
 };
 
 
@@ -50,7 +53,7 @@ export const tripsApi = api.injectEndpoints({
     }),
 
     // Documents
-    addDocument: build.mutation<{ success: boolean; data: any }, { id: string; name: string; url: string; size?: number; mimeType?: string }>({
+    addDocument: build.mutation<{ success: boolean; data: unknown }, { id: string; name: string; url: string; size?: number; mimeType?: string }>({
       query: ({ id, ...body }) => ({ url: `/trips/${id}/documents`, method: "POST", body }),
       invalidatesTags: (_r, _e, { id }) => [{ type: "Trips", id }],
     }),
@@ -60,11 +63,11 @@ export const tripsApi = api.injectEndpoints({
     }),
 
     // Packing
-    addPackingItem: build.mutation<{ success: boolean; data: any }, { id: string; name: string; quantity?: number; category?: string }>({
+    addPackingItem: build.mutation<{ success: boolean; data: unknown }, { id: string; name: string; quantity?: number; category?: string }>({
       query: ({ id, ...body }) => ({ url: `/trips/${id}/packing-items`, method: "POST", body }),
       invalidatesTags: (_r, _e, { id }) => [{ type: "Trips", id }],
     }),
-    togglePackingChecked: build.mutation<{ success: boolean; data: any }, { id: string; itemId: string; checked: boolean }>({
+    togglePackingChecked: build.mutation<{ success: boolean; data: unknown }, { id: string; itemId: string; checked: boolean }>({
       query: ({ id, itemId, checked }) => ({
         url: `/trips/${id}/packing-items/${itemId}/toggle`,
         method: "PATCH",
@@ -74,13 +77,13 @@ export const tripsApi = api.injectEndpoints({
     }),
 
     // Collaborators
-    setCollaborator: build.mutation<{ success: boolean; data: any }, { id: string; userId: string; role: string; status?: string }>({
+    setCollaborator: build.mutation<{ success: boolean; data: unknown }, { id: string; userId: string; role: string; status?: string }>({
       query: ({ id, ...body }) => ({ url: `/trips/${id}/collaborators`, method: "POST", body }),
       invalidatesTags: (_r, _e, { id }) => [{ type: "Trips", id }],
     }),
 
     // Days
-    addDay: build.mutation<{ success: boolean; data: any }, { id: string; date: string; activities?: any[] }>({
+    addDay: build.mutation<{ success: boolean; data: unknown }, { id: string; date: string; activities?: unknown[] }>({
       query: ({ id, ...body }) => ({ url: `/trips/${id}/days`, method: "POST", body }),
       invalidatesTags: (_r, _e, { id }) => ["TripDays", { type: "Trips", id }],
     }),

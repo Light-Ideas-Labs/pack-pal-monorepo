@@ -8,10 +8,7 @@ import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "../ui/
 type OverviewItem = { label: string; icon: React.ReactNode; active?: boolean; key: string };
 type DayItem = { id: string; label: string; active?: boolean; date?: string };
 
-function monthAbbrev(iso: string) {
-  return new Date(iso).toLocaleString(undefined, { month: "short" }).toUpperCase();
-}
-
+// ordinal suffix helper (1st, 2nd, 3rd, 4th, etc)
 function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"], v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
@@ -34,9 +31,6 @@ function labelToISO(label: string) {
   const iso = new Date(y, Number(m[1]) - 1, Number(m[2]));
   return iso.toISOString();
 }
-
-
-
 
 export default function Sidebar({
   collapsed,
@@ -63,7 +57,7 @@ export default function Sidebar({
 if (collapsed) {
   return (
     <TooltipProvider delayDuration={200}>
-      <aside className="hidden h-full min-h-0 w-[72px] border-r p-2 md:flex md:flex-col md:items-center md:justify-between overflow-hidden">
+      <aside className="hidden sticky top-[var(--topbar-h)] h-[calc(100dvh-var(--topbar-h))] w-full border-r p-2 min-h-0 md:flex md:flex-col md:items-center md:justify-between">
         {/* Top (expand, AI, overview) */}
         <div className="w-full flex flex-col items-center">
           <Button
@@ -110,7 +104,7 @@ if (collapsed) {
           </div>
 
           {/* Dates list (only scrollable region) */}
-          <div className="mt-4 flex-1 min-h-0 overflow-y-auto w-full">
+          <div className="mt-4 flex-1 w-full">
             <div className="flex flex-col items-center gap-4 pb-2">
               <div className="rounded-full bg-muted p-2">
                 <CalendarDays className="h-4 w-4 text-muted-foreground" />
@@ -141,7 +135,7 @@ if (collapsed) {
         </div>
 
         {/* Bottom (Budget pinned) */}
-        <div className="mt-auto mb-2 flex flex-col items-center sticky bottom-2">
+        <div className="mt-auto mb-2 flex flex-col items-center sticky">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -166,7 +160,7 @@ if (collapsed) {
   // ---- EXPANDED SIDEBAR -----------------------------------------------------
   return (
     <TooltipProvider delayDuration={200}>
-      <aside className="hidden h-full w-[280px] border-r p-3 md:block">
+      <aside className="hidden sticky top-[var(--topbar-h)] h-[calc(100dvh-var(--topbar-h))] w-full border-r p-3 min-h-0 md:block">
         {/* expand → collapse chevron */}
         <div className="mb-2 flex justify-end">
           <Button

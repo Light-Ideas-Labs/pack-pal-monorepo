@@ -86,8 +86,9 @@ export default function InviteDialog({
       await onInviteEmails?.(parts, perm);
       toast.success("Invites sent");
       setEmailInput("");
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to send invites");
+    } catch (e: unknown) {
+      const err = e as { data?: { message?: string }; message?: string };
+      toast.error(err?.data?.message || err?.message || "Failed to send invites");
     }
   };
 
