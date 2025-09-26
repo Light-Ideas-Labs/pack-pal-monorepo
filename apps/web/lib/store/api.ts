@@ -10,6 +10,25 @@ const isMutating = (m?: string) => (["POST","PATCH","PUT","DELETE"] as FetchMeth
 const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api/v1";
 console.log("[api] baseUrl:", baseUrl);
 
+const selectToken = (state: unknown): string | null => {
+  try {
+    const s = state as RootState & { auth?: { token?: string | null } };
+    return s?.global?.user?.accessToken ?? s?.auth?.token ?? null;
+  } catch {
+    return null;
+  }
+};
+
+const selectGuestId = (state: unknown): string | undefined => {
+  try {
+    const s = state as RootState;
+    return s?.global?.user?.guestId ?? undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+
 /** public endpoints that should Never trigger refresh */
 const PUBLIC_AUTH_PATHS = [
   "/auth/signin",
@@ -58,23 +77,25 @@ export function handleApiSuccess(data: unknown, method?: string, url?: string) {
   toast.success(isMutating(method) ? "Saved" : "Success");
 }
 
-export function handleApiError(err: any) {
-  const msg = err?.data?.message || err?.error || (typeof err === "string" ? err : "Request failed");
+export function handleApiError(err: unknown) {
+  const e = err as { data?: { message?: string }; error?: string };
+  const msg = e?.data?.message || e?.error || (typeof err === "string" ? err : "Request failed");
   toast.error(msg);
 }
+
 
 /** Attach token + cookies; try refresh on 401 exactly once */
 const rawBase = fetchBaseQuery({
   baseUrl,
   credentials: "include",
   prepareHeaders: (headers, { getState }) => {
-    const state = getState() as RootState;
-    const token =  state.global?.user?.accessToken ?? (state as any).auth?.token;  // adjust to your actual slice property
+    const state = getState();
+    const token = selectToken(state);  // adjust to your actual slice property
     if (token) {
       headers.set("Authorization", `Bearer ${token}`);
-    } 
-    
-      const guestId = state.global?.user?.guestId;
+    }
+
+    const guestId = selectGuestId(state);
       if (!token && guestId) headers.set("x-guest-id", guestId);
 
   return headers;

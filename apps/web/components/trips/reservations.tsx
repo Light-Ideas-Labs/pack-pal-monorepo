@@ -10,7 +10,7 @@ type ReservationsProps = {
   onAdd?: (type: AddType) => void;
   budget?: {
     amount: number;
-    spent?: number;
+    spent: number;
     currency?: string;
     onView?: () => void;
   };
@@ -39,7 +39,9 @@ function RowItem({
         <span className="[&>svg]:h-4 [&>svg]:w-4 text-foreground/80 group-hover:text-foreground">
           {icon}
         </span>
-        <span className="text-[11px] leading-4 text-muted-foreground">{label}</span>
+        <span className="text-[11px] leading-4 text-muted-foreground whitespace-nowrap">
+          {label}
+        </span>
       </button>
     </div>
   );
@@ -62,53 +64,47 @@ export default function Reservations({
     }
   }, [budget.amount, budget.currency]);
 
-  const pct =
-    typeof budget.spent === "number" && budget.amount > 0
-      ? Math.max(0, Math.min(100, (budget.spent / budget.amount) * 100))
-      : 0;
+// const pct = Math.round((budget.spent / budget.amount) * 100);
 
   return (
-    <section className={cn("mt-4 overflow-visible", className)}>
-      <div className="grid gap-3 md:grid-cols-[1fr_minmax(220px,240px)]">
-        {/* Left: Reservations */}
-        <div className="rounded-xl border bg-muted/30 p-3 sm:p-4">
-          <h3 className="mb-2 text-sm font-semibold">Reservations and attachments</h3>
+<section className={cn("mt-4 overflow-visible", className)}>
+    {/* Left grows; right is compact */}
+    <div
+      className="
+        grid gap-3
+      md:grid-cols-[minmax(0,1fr)_clamp(170px,15vw,220px)]
+      xl:grid-cols-[minmax(0,1fr)_clamp(180px,14vw,240px)]
+      "
+    >
+      {/* Left: Reservations */}
+      <div className="min-w-0 rounded-xl border bg-muted/30 p-3 sm:p-4">
+        <h3 className="mb-2 text-sm font-semibold">Reservations and attachments</h3>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <RowItem icon={<Icons.Plane />} label="Flight" onClick={() => onAdd?.("flight")} />
-            <RowItem icon={<Icons.Building2 />} label="Lodging" onClick={() => onAdd?.("lodging")} withDivider />
-            <RowItem icon={<Icons.Car />} label="Rental car" onClick={() => onAdd?.("car")} withDivider />
-            <RowItem icon={<Icons.Utensils />} label="Restaurant" onClick={() => onAdd?.("restaurant")} withDivider />
-            <RowItem icon={<Icons.Paperclip />} label="Attachment" onClick={() => onAdd?.("attachment")} withDivider />
-            <RowItem icon={<Icons.MoreHorizontal />} label="Other" onClick={() => onAdd?.("other")} withDivider />
-          </div>
-        </div>
-
-        {/* Right: Budget snapshot */}
-        <div className="rounded-xl border bg-muted/30 p-3 sm:p-4">
-          <h3 className="text-sm font-semibold">Budgeting</h3>
-          <div className="mt-1 text-xl font-semibold tracking-tight">{formatted}</div>
-
-          {/* tiny progress bar (optional) */}
-          <div className="mt-2 h-6 rounded-lg bg-primary/20 p-1">
-            <div
-              className="h-full rounded-md bg-primary"
-              style={{ width: `${pct}%` }}
-              aria-hidden
-            />
-          </div>
-
-          <Button
-            type="button"
-            variant="link"
-            size="sm"
-            onClick={budget.onView}
-            className="px-0 mt-1"
-          >
-            View details
-          </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <RowItem icon={<Icons.Plane />} label="Flight" onClick={() => onAdd?.('flight')} />
+          <RowItem icon={<Icons.Building2 />} label="Lodging" onClick={() => onAdd?.('lodging')} withDivider />
+          <RowItem icon={<Icons.Car />} label="Rental car" onClick={() => onAdd?.('car')} withDivider />
+          <RowItem icon={<Icons.Utensils />} label="Restaurant" onClick={() => onAdd?.('restaurant')} withDivider />
+          <RowItem icon={<Icons.Paperclip />} label="Attachment" onClick={() => onAdd?.('attachment')} withDivider />
+          <RowItem icon={<Icons.MoreHorizontal />} label="Other" onClick={() => onAdd?.('other')} withDivider />
         </div>
       </div>
-    </section>
+
+      {/* Right: Budget snapshot (compact) */}
+      <div
+        className="
+        rounded-xl border bg-muted/30 p-3 sm:p-4
+        md:max-w-[220px] xl:max-w-[240px] justify-self-stretch
+        "
+      >
+        <h3 className="text-sm font-semibold">Budgeting</h3>
+        <div className="mt-1 text-xl font-semibold tracking-tight">{formatted}</div>
+
+        <Button type="button" variant="link" size="sm" onClick={budget.onView} className="px-0 mt-1">
+          View details
+        </Button>
+      </div>
+    </div>
+  </section>
   );
 }

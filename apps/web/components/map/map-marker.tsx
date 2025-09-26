@@ -9,100 +9,87 @@ import { LocationFeature } from "@/lib/mapbox/utils";
 type Props = {
   longitude: number;
   latitude: number;
-  data: any;
-  onHover?: ({
-    isHovered,
-    position,
-    marker,
-    data,
-  }: {
+  data: LocationFeature;
+
+  onHover?: ({ isHovered, position, marker, data, }: {
     isHovered: boolean;
     position: { longitude: number; latitude: number };
     marker: mapboxgl.Marker;
     data: LocationFeature;
   }) => void;
-  onClick?: ({
-    position,
-    marker,
-    data,
-  }: {
+
+  onClick?: ({ position, marker, data, }: {
     position: { longitude: number; latitude: number };
     marker: mapboxgl.Marker;
     data: LocationFeature;
   }) => void;
+  
   children?: React.ReactNode;
 } & MarkerOptions;
 
-export default function Marker({
-  children,
-  latitude,
-  longitude,
-  data,
-  onHover,
-  onClick,
-  ...props
-}: Props) {
+export default function Marker({children, latitude, longitude, data, onHover, onClick, ...props }: Props) {
   const { map } = useMap();
-  const markerRef = useRef<HTMLDivElement | null>(null);
-  let marker: mapboxgl.Marker | null = null;
+  const markerElRef = useRef<HTMLDivElement | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
+
 
   const handleHover = (isHovered: boolean) => {
-    if (onHover && marker) {
+    if (onHover && markerRef.current) {
       onHover({
         isHovered,
         position: { longitude, latitude },
-        marker,
+        marker: markerRef.current,
         data,
       });
     }
   };
 
   const handleClick = () => {
-    if (onClick && marker) {
+    if (onClick && markerRef.current) {
       onClick({
         position: { longitude, latitude },
-        marker,
+        marker: markerRef.current,
         data,
       });
     }
   };
 
   useEffect(() => {
-    const markerEl = markerRef.current;
-    if (!map || !markerEl) return;
+    const el = markerElRef.current;
+    if (!map || !el) return;
 
     const handleMouseEnter = () => handleHover(true);
     const handleMouseLeave = () => handleHover(false);
 
     // Add event listeners
-    markerEl.addEventListener("mouseenter", handleMouseEnter);
-    markerEl.addEventListener("mouseleave", handleMouseLeave);
-    markerEl.addEventListener("click", handleClick);
+    el.addEventListener("mouseenter", handleMouseEnter);
+    el.addEventListener("mouseleave", handleMouseLeave);
+    el.addEventListener("click", handleClick);
 
     // Marker options
     const options = {
-      element: markerEl,
+      element: el,
       ...props,
     };
 
-    marker = new mapboxgl.Marker(options)
+    markerRef.current = new mapboxgl.Marker(options)
       .setLngLat([longitude, latitude])
       .addTo(map);
 
     return () => {
       // Cleanup on unmount
-      if (marker) marker.remove();
-      if (markerEl) {
-        markerEl.removeEventListener("mouseenter", handleMouseEnter);
-        markerEl.removeEventListener("mouseleave", handleMouseLeave);
-        markerEl.removeEventListener("click", handleClick);
+      if (markerRef.current) markerRef.current.remove();
+      if (el) {
+        el.removeEventListener("mouseenter", handleMouseEnter);
+        el.removeEventListener("mouseleave", handleMouseLeave);
+        el.removeEventListener("click", handleClick);
       }
     };
   }, [map, longitude, latitude, props]);
 
   return (
     <div>
-      <div ref={markerRef}>{children}</div>
+      <div ref={markerElRef}>{children}</div>
     </div>
   );
 }

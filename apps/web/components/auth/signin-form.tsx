@@ -25,12 +25,11 @@ function roleToPath(role?: string | null) {
   return "/trips/list"; // default to customer home
 }
 
-export function SignInForm({className, ...props}: React.ComponentProps<"div">) {
+export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextParam = searchParams.get("next") || "";
 
-  const [email, setEmail] = React.useState("");
   const [showPassword, setShowPassword] = React.useState(false);
 
 
@@ -56,8 +55,8 @@ export function SignInForm({className, ...props}: React.ComponentProps<"div">) {
 
       // Use replace to avoid going back to login on back nav
       router.replace(target);
-    } catch (err: any) {
-      const msg = err?.data?.message || err?.message || "Login failed";
+    } catch (err: unknown) {
+      const msg = (err as { data?: { message?: string }; message?: string })?.data?.message || (err as { message?: string })?.message || "Login failed";
       toast.error(msg);
     }
   }

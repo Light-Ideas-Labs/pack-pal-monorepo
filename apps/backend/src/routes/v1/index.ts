@@ -19,10 +19,10 @@ routing.use("/api/v1/users", userRoutes);
 routing.use("/api/v1/plans", plansRoutes);
 routing.use("/api/v1/trips", tripsRoutes);
 routing.use("/api/v1/subscription", subscriptionRoutes);
-routing.use("/api/v1", travelRequirementRoutes);
+routing.use("/api/v1/travel-requirements", travelRequirementRoutes);
 routing.use("/api/v1/watchlist", watchlistRoutes);
 
 // internal routes v1 health check
-routing.use(healthRoutes);
+routing.use("/api/v1/health", healthRoutes);
 
 export default routing;

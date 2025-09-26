@@ -254,6 +254,7 @@ export function HeartSolid(props: IconProps) {
 export function CloseLine(props: IconProps) {
   return (
     <svg
+      {...props}
       xmlns="http://www.w3.org/2000/svg"
       width="28"
       height="28"

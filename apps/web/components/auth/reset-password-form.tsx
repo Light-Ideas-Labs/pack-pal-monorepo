@@ -1,4 +1,4 @@
-import { HTMLAttributes, useState } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,9 +13,7 @@ import { useSetNewPasswordMutation } from "@/lib/api/authApi";
 import { AuthHeader } from "@/components/auth/auth-header";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/validation/auth";
 
-interface ResetPasswordFormProps extends HTMLAttributes<HTMLDivElement> {}
-
-export default function UserResetPasswordForm({className, ...props}: ResetPasswordFormProps) {
+export default function UserResetPasswordForm() {
   const router = useRouter();
   const sp = useSearchParams();
   const token = sp.get("token") || "";
@@ -41,10 +39,11 @@ export default function UserResetPasswordForm({className, ...props}: ResetPasswo
       toast.success(res?.message || "Password reset successful.");
       router.push(`/auth/sign-in`);
 
-    } catch (error: any) {
-      console.log("Error during password reset:", error);
-      toast.error(error?.data?.message || "Password reset failed. Please try again.");
-    } 
+    } catch (error: unknown) {
+    const err = error as { data?: { message?: string } };
+    console.log("Error during password reset:", error);
+    toast.error(err?.data?.message || "Password reset failed. Please try again.");
+    }
   }
 
   return (
