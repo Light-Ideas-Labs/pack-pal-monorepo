@@ -209,15 +209,6 @@ export default function PrivacyPage() {
             . Postal: Light Ideas, Nairobi, Kenya.
           </p>
         </section>
-
-        <section className="border-t pt-6 text-sm text-muted-foreground">
-          <p>
-            <em>Legal note:</em> This Policy is a general template and does not
-            replace legal advice. Requirements can vary across African and other
-            jurisdictions; consider a review by counsel before publishing to
-            the Play Store.
-          </p>
-        </section>
       </div>
     </main>
   );
