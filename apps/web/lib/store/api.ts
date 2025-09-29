@@ -7,7 +7,7 @@ import type { ApiEnvelope } from "@/types";
 type FetchMethod = "GET"|"POST"|"PATCH"|"PUT"|"DELETE";
 const isMutating = (m?: string) => (["POST","PATCH","PUT","DELETE"] as FetchMethod[]).includes((m||"GET").toUpperCase() as FetchMethod)
 
-const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api/v1";
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE || "https://pack-pal-monorepo.onrender.com/api/v1";
 console.log("[api] baseUrl:", baseUrl);
 
 const selectToken = (state: unknown): string | null => {
