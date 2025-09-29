@@ -191,15 +191,6 @@ export default function TermsPage() {
             .
           </p>
         </section>
-
-        <section className="border-t pt-6 text-sm text-muted-foreground">
-          <p>
-            <em>Legal note:</em> This template is provided for convenience only and
-            does not constitute legal advice. Consider obtaining independent
-            legal review, especially for app-store, consumer and data protection
-            requirements in the countries where you operate.
-          </p>
-        </section>
       </div>
     </main>
   );

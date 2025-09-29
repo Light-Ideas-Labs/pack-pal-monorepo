@@ -25,6 +25,7 @@ const app: Express = express();
 
 /** Allow dev and prod origins */
 const allowedOrigins = new Set<string>([
+    "https://pack-pal-monorepo.vercel.app",
     "https://packpal.travel", // Production frontend with HTTPS
     "http://localhost:3000",
     "http://localhost:3001", // Local frontend
