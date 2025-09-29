@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -21,13 +21,20 @@ type Props = React.ComponentProps<"form"> & { redirectTo?: string };
 
 export function SignUpForm({ redirectTo, ...formProps }: Props) {
   const router = useRouter();
-  const sp = useSearchParams();
-  const next = redirectTo ?? sp.get("next") ?? "/auth/activate-account";
+  const [nextParam, setNextParam] = useState<string>("/auth/activate-account")
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [signUp, { isLoading, error }] = useSignUpMutation();
+
+  useEffect(() => {
+    if (redirectTo) { setNextParam(redirectTo); return; }
+    if (typeof window !== "undefined") {
+      const n = new URLSearchParams(window.location.search).get("next");
+      if (n) setNextParam(n);
+    }
+  }, [redirectTo]);
 
   const form = useForm<SignUpInput>({
     resolver: zodResolver(signUpSchema),
@@ -54,7 +61,7 @@ export function SignUpForm({ redirectTo, ...formProps }: Props) {
 
       if (token) {
         sessionStorage.setItem("activationToken", token);
-        router.push(`${next}?token=${encodeURIComponent(token)}`);
+        router.push(`${nextParam}?token=${encodeURIComponent(token)}`);
       } else {
         toast.info("Account created. Check your email for an activation link/code.");
         router.push("/auth/sign-in");

@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState} from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
@@ -27,10 +27,16 @@ function roleToPath(role?: string | null) {
 
 export function SignInForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const nextParam = searchParams.get("next") || "";
+  const [nextParam, setNextParam] = useState<string>("");
 
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const n = new URLSearchParams(window.location.search).get("next") || "";
+      setNextParam(n);
+    }
+  }, []);
 
 
   const form = useForm<SignInFormValues>({
