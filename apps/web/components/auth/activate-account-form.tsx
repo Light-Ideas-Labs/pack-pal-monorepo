@@ -1,26 +1,35 @@
 "use client";
 
-import { useEffect} from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormMessage, } from "@/components/ui/form";
 
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { AuthHeader } from "@/components/auth/auth-header";
-import { InputOTP, InputOTPGroup,InputOTPSlot, InputOTPSeparator, } from "@/components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp";
 import { useActivateAccountMutation } from "@/lib/api/authApi";
 import { activateAccountSchema, type ActivateAccountInput } from "@/lib/validation/auth";
 
 export function AccountActivationForm() {
   const router = useRouter();
-  const sp = useSearchParams();
+  const [activationToken, setActivationToken] = useState<string>("");
 
-  // prefer the query param (your Ventiqo style), fallback to sessionStorage
-  const tokenFromUrl = sp.get("token") || "";
-  const tokenFromSession = typeof window !== "undefined" ? sessionStorage.getItem("activation_token") : null;
-  const activation_token = tokenFromUrl || tokenFromSession || "";
+  // Read token from URL (client) or sessionStorage, no useSearchParams needed.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const urlToken = new URLSearchParams(window.location.search).get("token") || "";
+    const sessionToken = sessionStorage.getItem("activation_token") || "";
+    const token = urlToken || sessionToken || "";
+
+    setActivationToken(token);
+
+    // keep a copy so a refresh still works
+    if (urlToken) sessionStorage.setItem("activation_token", urlToken);
+  }, []);
 
   const form = useForm<ActivateAccountInput>({
     resolver: zodResolver(activateAccountSchema),
@@ -28,13 +37,12 @@ export function AccountActivationForm() {
     mode: "onChange",
   });
 
+  // push the token into RHF when we have it
   useEffect(() => {
-    if (activation_token) {
-      form.setValue("activation_token", activation_token, {
-        shouldValidate: true,
-      });
+    if (activationToken) {
+      form.setValue("activation_token", activationToken, { shouldValidate: true });
     }
-  }, [activation_token, form]);
+  }, [activationToken, form]);
 
   const [activateAccount, { isLoading }] = useActivateAccountMutation();
 
@@ -56,10 +64,7 @@ export function AccountActivationForm() {
 
   return (
     <>
-      <AuthHeader
-        title="Activate your account"
-        subtitle="Enter the 6-digit code we emailed you."
-      />
+      <AuthHeader title="Activate your account" subtitle="Enter the 6-digit code we emailed you." />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-6">
           <div className="grid gap-2">
@@ -73,14 +78,12 @@ export function AccountActivationForm() {
               control={form.control}
               name="activation_code"
               render={({ field }) => (
-                <FormItem className="space-y-1 ">
+                <FormItem className="space-y-1">
                   <FormControl>
                     <InputOTP
                       maxLength={6}
                       value={field.value}
-                      onChange={(v) =>
-                        field.onChange((v as string).replace(/\D/g, ""))
-                      }
+                      onChange={(v) => field.onChange((v as string).replace(/\D/g, ""))}
                       className="justify-between"
                     >
                       <InputOTPGroup>
@@ -101,18 +104,14 @@ export function AccountActivationForm() {
               )}
             />
 
-            {!activation_token && (
+            {!activationToken && (
               <p className="text-xs text-amber-600">
-                We couldn’t find an activation token. Please sign up again, or
-                open the link from your email on this device.
+                We couldn’t find an activation token. Please sign up again, or open the link from your email on this device.
               </p>
             )}
           </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={isLoading || !activation_token}
-          >
+
+          <Button type="submit" className="w-full" disabled={isLoading || !activationToken}>
             {isLoading ? "Activating..." : "Activate Account"}
           </Button>
         </form>

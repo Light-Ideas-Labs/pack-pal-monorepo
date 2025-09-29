@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -15,13 +15,18 @@ import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/validation/a
 
 export default function UserResetPasswordForm() {
   const router = useRouter();
-  const sp = useSearchParams();
-  const token = sp.get("token") || "";
+  const [token, setToken] = useState( "");
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
 
   const [setNewPassword, { isLoading}] = useSetNewPasswordMutation();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const urlToken = new URLSearchParams(window.location.search).get("token") || "";
+    setToken(urlToken);
+  }, []);
 
   const form = useForm<ResetPasswordInput>({
     resolver: zodResolver(resetPasswordSchema),

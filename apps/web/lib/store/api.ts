@@ -114,8 +114,7 @@ const customBaseQuery = async (args: string | FetchArgs, api: BaseQueryApi, extr
   // - the original request is NOT a public auth endpoint
   // - we appear to have a logged-in session (e.g., we store a refresh token or are “authenticated” in state)
   // - we are not already calling refresh-token (avoid loops)
-  const state = api.getState() as any;
-  const token = state?.auth?.token as string | null;
+  const token = selectToken(api.getState());
   const looksLoggedIn = Boolean(token);
 
   if (res.error?.status === 401 && !isPublicAuthUrl(url) && looksLoggedIn) {
